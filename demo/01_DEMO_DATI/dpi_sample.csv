@@ -1,0 +1,6 @@
+ID;Descrizione;Categoria;Scadenza;Stato
+DPI-001;Casco di protezione EN 397;Testa;2026-12-31;Valido
+DPI-002;Occhiali di sicurezza EN 166;Occhi;2025-09-30;In scadenza
+DPI-003;Guanti antitaglio EN 388;Mani;2026-06-15;Valido
+DPI-004;Scarpe antinfortunistiche EN ISO 20345;Piedi;2025-03-01;Scaduto
+DPI-005;Otoprotettori EN 352;Udito;2026-11-20;Valido
