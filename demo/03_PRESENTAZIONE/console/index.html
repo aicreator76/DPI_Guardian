@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SISTEMA FASCICOLO DPI PRO</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --surface-3: #eef4fb;
+      --border: #d9e2ec;
+      --border-strong: #c3d2e3;
+      --text: #102a43;
+      --muted: #486581;
+      --primary: #1f6feb;
+      --primary-dark: #1756b8;
+      --primary-soft: #e8f1ff;
+      --success: #137333;
+      --success-soft: #e7f6ec;
+      --warning: #b26a00;
+      --warning-soft: #fff4df;
+      --danger: #b42318;
+      --danger-soft: #fdecec;
+      --neutral: #5b6b7b;
+      --neutral-soft: #edf2f7;
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 8px 20px rgba(15, 23, 42, 0.06);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background: linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 880px;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .target-chip,
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      white-space: nowrap;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid transparent;
+      font-size: 13px;
+    }
+
+    .target-chip {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: rgba(31,111,235,0.12);
+    }
+
+    .status-chip {
+      background: var(--success-soft);
+      color: var(--success);
+      border-color: rgba(19,115,51,0.12);
+    }
+
+    .hero-strip {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .hero-card,
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+    }
+
+    .hero-card h2,
+    .summary-card h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-card p,
+    .summary-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hero-card {
+      min-height: 142px;
+    }
+
+    .summary-card {
+      min-height: 142px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .summary-mini {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #fbfdff 0%, #f4f8fc 100%);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .summary-mini-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .summary-mini-value {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      min-height: 106px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      right: -14px;
+      top: -14px;
+      width: 88px;
+      height: 88px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(31, 111, 235, 0.06), rgba(31, 111, 235, 0));
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-value {
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      position: relative;
+      z-index: 1;
+    }
+
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      flex: 1 1 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.small {
+      flex: 0 0 280px;
+    }
+
+    .label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(31,111,235,0.12);
+    }
+
+    .quick-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .quick-chip {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .quick-chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(31,111,235,0.2);
+      color: var(--primary);
+    }
+
+    .quick-chip.active {
+      background: var(--primary-soft);
+      border-color: rgba(31,111,235,0.18);
+      color: var(--primary);
+    }
+
+    .section-intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      margin: 6px 0 12px;
+      padding: 0 2px;
+    }
+
+    .section-intro-text h2 {
+      margin: 0 0 8px;
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .section-intro-text p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .section-intro-meta {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #fbfdff 0%, #f1f7fd 100%);
+    }
+
+    .table-title {
+      font-size: 18px;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .table-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+      max-width: 430px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1480px;
+    }
+
+    th, td {
+      padding: 16px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e9eef5;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      background: #fbfdff;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 900;
+    }
+
+    tbody tr {
+      transition: background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    tbody tr:hover {
+      background: #f9fbff;
+    }
+
+    tbody tr.row-selected {
+      background: #eef5ff;
+      box-shadow: inset 4px 0 0 var(--primary);
+    }
+
+    .name-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .primary-text {
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .secondary-text {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mono-text {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .dpi-id-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #f2f7fd;
+      border: 1px solid #dbe7f5;
+      font-weight: 900;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .model-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .model-main {
+      font-weight: 900;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .model-sub {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 108px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      border: 1px solid transparent;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .badge.ok {
+      color: var(--success);
+      background: var(--success-soft);
+      border-color: rgba(19,115,51,0.12);
+    }
+
+    .badge.warning {
+      color: var(--warning);
+      background: var(--warning-soft);
+      border-color: rgba(178,106,0,0.12);
+    }
+
+    .badge.danger {
+      color: var(--danger);
+      background: var(--danger-soft);
+      border-color: rgba(180,35,24,0.12);
+    }
+
+    .badge.info {
+      color: var(--primary);
+      background: var(--primary-soft);
+      border-color: rgba(31,111,235,0.12);
+    }
+
+    .status-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .status-sub {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .actions-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .action-btn,
+    .ghost-btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+    }
+
+    .action-btn {
+      background: linear-gradient(180deg, #13355b 0%, #102a43 100%);
+      color: #fff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .action-btn:hover:not(:disabled),
+    .ghost-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .ghost-btn {
+      background: #fff;
+      color: var(--primary);
+      border: 1px solid rgba(31,111,235,0.18);
+    }
+
+    .ghost-btn.disabled,
+    .ghost-btn:disabled,
+    .action-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .ghost-btn.disabled {
+      color: var(--muted);
+      border-color: var(--border);
+      background: #f7f9fc;
+    }
+
+    .empty-state {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .fascicolo-band {
+      margin-top: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+    }
+
+    .fascicolo-band h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .fascicolo-band p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .fascicolo-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .fascicolo-box {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .fascicolo-box-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .fascicolo-box-value {
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .footer-notes {
+      margin-top: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 22px 18px;
+    }
+
+    .footer-notes h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .footer-notes ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 40;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(560px, 100%);
+      height: 100vh;
+      background: #fff;
+      box-shadow: -24px 0 60px rgba(15,23,42,0.18);
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer-header {
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .drawer-title {
+      margin: 0 0 6px;
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .drawer-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .drawer-close {
+      border: 0;
+      background: #eef3f8;
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .drawer-body {
+      padding: 20px 22px 28px;
+      overflow-y: auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .drawer-top-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .drawer-panel {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .drawer-panel h4 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .drawer-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .detail-card {
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      border-radius: 14px;
+      padding: 14px;
+      min-height: 88px;
+    }
+
+    .detail-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .file-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    @media (max-width: 1180px) {
+      .hero-strip,
+      .fascicolo-band {
+        grid-template-columns: 1fr;
+      }
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .header-right {
+        align-items: flex-start;
+      }
+      .section-intro {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 18px;
+      }
+      .stats,
+      .summary-grid,
+      .fascicolo-summary,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+      .field,
+      .field.small {
+        flex: 1 1 100%;
+      }
+      .drawer {
+        width: 100%;
+      }
+      .actions-inline {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div>
+        <h1>SISTEMA FASCICOLO DPI PRO</h1>
+        <p class="subtitle">
+          Demo interattiva locale per il controllo DPI di operatori, manuali e revisioni.
+          Versione rifinita per presentazione: lettura rapida, scheda operativa e valutazione fascicolo.
+        </p>
+      </div>
+      <div class="header-right">
+        <div class="target-chip">Target: aziende con DPI</div>
+        <div class="status-chip">Stato: V1 vendibile</div>
+      </div>
+    </div>
+
+    <section class="hero-strip">
+      <article class="hero-card">
+        <h2>Situazione DPI</h2>
+        <p id="heroSummary">
+          La vista corrente mostra 5 DPI, con 1 record completo, 4 in attenzione e 4 con revisione ancora mancante.
+        </p>
+      </article>
+
+      <article class="summary-card">
+        <h2>Quadro di controllo</h2>
+        <p>Vista sintetica per confronto immediato durante presentazione e verifica operativa.</p>
+        <div class="summary-grid">
+          <div class="summary-mini">
+            <div class="summary-mini-label">Manuali OK</div>
+            <div class="summary-mini-value" id="miniManualiOk">0</div>
+          </div>
+          <div class="summary-mini">
+            <div class="summary-mini-label">Revisioni OK</div>
+            <div class="summary-mini-value" id="miniRevisioniOk">0</div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="stats">
+      <article class="stat-card">
+        <div class="stat-label">Operatori</div>
+        <div class="stat-value" id="statOperatori">0</div>
+        <div class="stat-note">Operatori unici visibili con i filtri attivi</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">DPI Totali</div>
+        <div class="stat-value" id="statDpi">0</div>
+        <div class="stat-note">Record attualmente visibili in tabella</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Manuale OK</div>
+        <div class="stat-value" id="statManualiOk">0</div>
+        <div class="stat-note">DPI con manuale disponibile e collegato</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Revisione mancante</div>
+        <div class="stat-value" id="statRevMancante">0</div>
+        <div class="stat-note">DPI che richiedono ancora verifica o revisione</div>
+      </article>
+    </section>
+
+    <section class="toolbar">
+      <div class="field">
+        <label class="label" for="searchInput">Ricerca</label>
+        <input id="searchInput" type="text" placeholder="Cerca per operatore, modello, DPI o matricola..." />
+      </div>
+
+      <div class="field small">
+        <label class="label" for="statusFilter">Stato record</label>
+        <select id="statusFilter">
+          <option value="tutti">Tutti gli stati</option>
+          <option value="completi">Completi</option>
+          <option value="revisione-mancante">Con revisione mancante</option>
+          <option value="manuale-disponibile">Con manuale disponibile</option>
+          <option value="critici">Critici</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="quick-filters">
+      <button class="quick-chip active" data-quick="tutti">Tutti</button>
+      <button class="quick-chip" data-quick="rossini">Completi</button>
+      <button class="quick-chip" data-quick="spadaro">Da verificare</button>
+      <button class="quick-chip" data-quick="manuali-ok">Manuali OK</button>
+      <button class="quick-chip" data-quick="revisioni-ok">Revisioni OK</button>
+      <button class="quick-chip" data-quick="revisioni-mancanti">Revisioni mancanti</button>
+    </div>
+
+    <div class="section-intro">
+      <div class="section-intro-text">
+        <h2>Centrale controllo DPI</h2>
+        <p>Controllo DPI aziendale · documenti, revisioni, fascicolo e verifica rapida</p>
+      </div>
+      <div class="section-intro-meta" id="sectionMeta">Dataset demo consolidato</div>
+    </div>
+
+    <section class="table-wrap">
+      <div class="table-header">
+        <div>
+          <h2 class="table-title">Registro DPI aziendale</h2>
+          <div class="table-meta" id="tableMeta">0 record visualizzati</div>
+        </div>
+        <div class="legend">
+          <span>Lettura rapida di operatori, modelli, manuali e revisioni con vista utile per fascicolo e controllo.</span>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Operatore</th>
+              <th>DPI ID</th>
+              <th>DPI</th>
+              <th>Modello</th>
+              <th>Norma</th>
+              <th>Matricola</th>
+              <th>Prossima revisione</th>
+              <th>Manuale</th>
+              <th>Revisione</th>
+              <th>Stato</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" id="emptyState" hidden>Nessun risultato con i filtri attuali.</div>
+    </section>
+
+    <section class="fascicolo-band">
+      <div>
+        <h3>Esito fascicoli demo</h3>
+        <p id="fascicoloNarrative">
+          La demo consente una lettura immediata di record pronti e record da completare, utile per mostrare valore pratico senza appesantire la presentazione.
+        </p>
+      </div>
+      <div class="fascicolo-summary">
+        <div class="fascicolo-box">
+          <div class="fascicolo-box-label">Fascicoli pronti</div>
+          <div class="fascicolo-box-value" id="fascicoloPronti">0</div>
+        </div>
+        <div class="fascicolo-box">
+          <div class="fascicolo-box-label">Da completare</div>
+          <div class="fascicolo-box-value" id="fascicoloDaCompletare">0</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="footer-notes">
+      <h3>Valore del software in demo</h3>
+      <ul>
+        <li>lettura immediata dello stato documentale per ogni DPI</li>
+        <li>distinzione chiara tra DPI completi, da verificare e incompleti</li>
+        <li>base vendibile per controllo DPI, fascicolo e consultazione rapida</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+  <aside class="drawer" id="detailDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div>
+        <h3 class="drawer-title" id="drawerTitle">Dettaglio DPI</h3>
+        <p class="drawer-subtitle" id="drawerSubtitle">Scheda operativa completa</p>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Chiudi dettaglio">×</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="drawer-top-badges" id="drawerTopBadges"></div>
+
+      <div class="drawer-panel">
+        <h4>Stato documentale</h4>
+        <p id="drawerNarrative">Questo record è pronto per controllo documentale e consultazione rapida.</p>
+      </div>
+
+      <div class="detail-grid" id="drawerContent"></div>
+
+      <div class="drawer-panel">
+        <h4>Esito fascicolo</h4>
+        <p id="drawerActionsText">Consultazione scheda, verifica documenti, preparazione fascicolo e supporto a controllo RSPP.</p>
+      </div>
+    </div>
+  </aside>
+
+ <script>
+  let demoRows = [
+    {
+      id: 1,
+      dpi_id: 'DPI-R001',
+      operatore: 'Rossini Davide',
+      dpi: 'Imbracatura',
+      modello: 'ERGO CLIP PLUS',
+      norma: 'EN361',
+      matricola: '22102 02008',
+      manuale: 'instruction-manual_ergo_serie.pdf',
+      manuale_ok: 'SI',
+      revisione: 'nessuna',
+      revisione_ok: 'NO',
+      prossima_revisione: '2027-03-11'
+    },
+    {
+      id: 2,
+      dpi_id: 'DPI-R002',
+      operatore: 'Rossini Davide',
+      dpi: 'Connettore',
+      modello: 'MULTIGRIP',
+      norma: 'EN362',
+      matricola: '205',
+      manuale: 'instruction-manual_multigrip.pdf',
+      manuale_ok: 'SI',
+      revisione: 'nessuna',
+      revisione_ok: 'NO',
+      prossima_revisione: '2027-03-11'
+    },
+    {
+      id: 3,
+      dpi_id: 'DPI-S001',
+      operatore: 'Spadaro',
+      dpi: 'Cordino con assorbitore',
+      modello: 'FallSorb Y-Lany',
+      norma: 'EN355',
+      matricola: '0441-818803022',
+      manuale: 'fallsorb-en.pdf',
+      manuale_ok: 'SI',
+      revisione: 'nessuna',
+      revisione_ok: 'NO',
+      prossima_revisione: '2027-03-11'
+    },
+    {
+      id: 4,
+      dpi_id: 'DPI-S002',
+      operatore: 'Spadaro',
+      dpi: 'Imbracatura',
+      modello: 'ERGO CLIP PLUS',
+      norma: 'EN361',
+      matricola: '8223V0222',
+      manuale: 'instruction-manual_ergo_serie.pdf',
+      manuale_ok: 'SI',
+      revisione: 'spadaro_ergo_plus_revisione_2026-03-11.jpg.png',
+      revisione_ok: 'SI',
+      prossima_revisione: '2027-03-11'
+    },
+    {
+      id: 5,
+      dpi_id: 'DPI-S003',
+      operatore: 'Spadaro',
+      dpi: 'Cordino con assorbitore',
+      modello: 'FallSorb Y-Lany',
+      norma: 'EN355',
+      matricola: '0441-818803022',
+      manuale: 'fallsorb-en.pdf',
+      manuale_ok: 'SI',
+      revisione: 'nessuna',
+      revisione_ok: 'NO',
+      prossima_revisione: '2027-03-11'
+    }
+  ];
+
+  const elements = {
+    searchInput: document.getElementById('searchInput'),
+    statusFilter: document.getElementById('statusFilter'),
+    tableBody: document.getElementById('tableBody'),
+    tableMeta: document.getElementById('tableMeta'),
+    emptyState: document.getElementById('emptyState'),
+    statOperatori: document.getElementById('statOperatori'),
+    statDpi: document.getElementById('statDpi'),
+    statManualiOk: document.getElementById('statManualiOk'),
+    statRevMancante: document.getElementById('statRevMancante'),
+    miniManualiOk: document.getElementById('miniManualiOk'),
+    miniRevisioniOk: document.getElementById('miniRevisioniOk'),
+    sectionMeta: document.getElementById('sectionMeta'),
+    heroSummary: document.getElementById('heroSummary'),
+    fascicoloPronti: document.getElementById('fascicoloPronti'),
+    fascicoloDaCompletare: document.getElementById('fascicoloDaCompletare'),
+    fascicoloNarrative: document.getElementById('fascicoloNarrative'),
+    detailDrawer: document.getElementById('detailDrawer'),
+    drawerBackdrop: document.getElementById('drawerBackdrop'),
+    drawerClose: document.getElementById('drawerClose'),
+    drawerTitle: document.getElementById('drawerTitle'),
+    drawerSubtitle: document.getElementById('drawerSubtitle'),
+    drawerTopBadges: document.getElementById('drawerTopBadges'),
+    drawerContent: document.getElementById('drawerContent'),
+    drawerNarrative: document.getElementById('drawerNarrative'),
+    drawerActionsText: document.getElementById('drawerActionsText')
+  };
+
+  let selectedRowId = null;
+  let activeQuickFilter = 'tutti';
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function hasManual(row) {
+    return String(row.manuale_ok ?? '').toUpperCase() === 'SI' && row.manuale && row.manuale !== 'nessuna';
+  }
+
+  function hasReview(row) {
+    return String(row.revisione_ok ?? '').toUpperCase() === 'SI' && row.revisione && row.revisione !== 'nessuna';
+  }
+
+  function daysUntil(dateString) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(dateString);
+    if (Number.isNaN(target.getTime())) return 0;
+    return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+  }
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return '-';
+    return new Intl.DateTimeFormat('it-IT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(date);
+  }
+
+  function formatReviewCountdown(days) {
+    if (days < 0) return `Scaduta da ${Math.abs(days)} giorni`;
+    if (days === 0) return 'Scade oggi';
+    return `${days} giorni al controllo`;
+  }
+
+  function getRowFlags(row) {
+    const manualMissing = !hasManual(row);
+    const reviewMissing = !hasReview(row);
+    const reviewDays = daysUntil(row.prossima_revisione);
+
+    let generalStatus = 'COMPLETO';
+    let generalClass = 'ok';
+
+    if (manualMissing) {
+      generalStatus = 'CRITICO';
+      generalClass = 'danger';
+    } else if (reviewMissing) {
+      generalStatus = 'ATTENZIONE';
+      generalClass = 'warning';
+    }
+
+    return {
+      manualMissing,
+      reviewMissing,
+      reviewDays,
+      attention: !manualMissing && reviewMissing,
+      critical: manualMissing,
+      complete: !manualMissing && !reviewMissing,
+      generalStatus,
+      generalClass
+    };
+  }
+
+  function badge(label, type) {
+    return `<span class="badge ${type}">${label}</span>`;
+  }
+
+  function getManualBadge(row) {
+    return hasManual(row) ? badge('OK', 'ok') : badge('MANCANTE', 'danger');
+  }
+
+  function getReviewBadge(row) {
+    return hasReview(row) ? badge('OK', 'ok') : badge('MANCANTE', 'warning');
+  }
+
+  function applyQuickFilter(rows) {
+    switch (activeQuickFilter) {
+      case 'rossini':
+        return rows.filter(row => row.operatore === 'Rossini Davide');
+      case 'spadaro':
+        return rows.filter(row => row.operatore === 'Spadaro');
+      case 'manuali-ok':
+        return rows.filter(row => hasManual(row));
+      case 'revisioni-ok':
+        return rows.filter(row => hasReview(row));
+      case 'revisioni-mancanti':
+        return rows.filter(row => !hasReview(row));
+      default:
+        return rows;
+    }
+  }
+
+  function filterRows() {
+    const search = (elements.searchInput?.value ?? '').trim().toLowerCase();
+    const status = elements.statusFilter?.value ?? 'tutti';
+
+    let rows = demoRows.filter((row) => {
+      const flags = getRowFlags(row);
+      const searchText = [
+        row.operatore,
+        row.modello,
+        row.dpi,
+        row.matricola,
+        row.dpi_id
+      ].join(' ').toLowerCase();
+
+      const matchesSearch = !search || searchText.includes(search);
+
+      let matchesStatus = true;
+      switch (status) {
+        case 'completi':
+          matchesStatus = flags.complete;
+          break;
+        case 'revisione-mancante':
+          matchesStatus = flags.reviewMissing;
+          break;
+        case 'manuale-disponibile':
+          matchesStatus = hasManual(row);
+          break;
+        case 'critici':
+          matchesStatus = flags.critical;
+          break;
+        default:
+          matchesStatus = true;
+      }
+
+      return matchesSearch && matchesStatus;
+    });
+
+    return applyQuickFilter(rows);
+  }
+
+  function renderStats(rows) {
+    const uniqueOperators = new Set(rows.map(r => r.operatore)).size;
+    const manualiOk = rows.filter(r => hasManual(r)).length;
+    const revisioniOk = rows.filter(r => hasReview(r)).length;
+    const revisioneMancante = rows.filter(r => !hasReview(r)).length;
+    const completi = rows.filter(r => getRowFlags(r).complete).length;
+
+    if (elements.statOperatori) elements.statOperatori.textContent = uniqueOperators;
+    if (elements.statDpi) elements.statDpi.textContent = rows.length;
+    if (elements.statManualiOk) elements.statManualiOk.textContent = manualiOk;
+    if (elements.statRevMancante) elements.statRevMancante.textContent = revisioneMancante;
+    if (elements.miniManualiOk) elements.miniManualiOk.textContent = manualiOk;
+    if (elements.miniRevisioniOk) elements.miniRevisioniOk.textContent = revisioniOk;
+    if (elements.fascicoloPronti) elements.fascicoloPronti.textContent = completi;
+    if (elements.fascicoloDaCompletare) elements.fascicoloDaCompletare.textContent = rows.length - completi;
+
+    if (!rows.length) {
+      if (elements.heroSummary) {
+        elements.heroSummary.textContent = 'I filtri attuali non mostrano record. Ripristina la vista completa per tornare al quadro generale.';
+      }
+      if (elements.fascicoloNarrative) {
+        elements.fascicoloNarrative.textContent = 'Nessun fascicolo visibile con i filtri correnti.';
+      }
+      return;
+    }
+
+    const attenzioni = rows.filter(r => getRowFlags(r).attention).length;
+
+    if (elements.heroSummary) {
+      elements.heroSummary.textContent =
+        `La vista corrente mostra ${rows.length} DPI, con ${completi} record completi, ${attenzioni} in attenzione e ${revisioneMancante} con revisione ancora mancante.`;
+    }
+
+    if (elements.fascicoloNarrative) {
+      elements.fascicoloNarrative.textContent =
+        `${completi} record risultano già presentabili come fascicolo completo, mentre ${rows.length - completi} richiedono ancora completamento documentale o revisione.`;
+    }
+  }
+
+  function renderFileButton(label, available, filename, cssClass) {
+    if (!available) {
+      return `<button type="button" class="${cssClass} disabled" disabled>${label}</button>`;
+    }
+    return `<button type="button" class="${cssClass}" data-file="${escapeHtml(filename)}">${label}</button>`;
+  }
+
+  function renderTable() {
+    const rows = filterRows();
+    elements.tableBody.innerHTML = '';
+    elements.emptyState.hidden = rows.length > 0;
+
+    rows.forEach((row) => {
+      const flags = getRowFlags(row);
+      const tr = document.createElement('tr');
+      tr.dataset.id = String(row.id);
+
+      if (selectedRowId === row.id) tr.classList.add('row-selected');
+
+      tr.innerHTML = `
+        <td>
+          <div class="name-stack">
+            <span class="primary-text">${escapeHtml(row.operatore)}</span>
+            <span class="secondary-text">Assegnazione attiva</span>
+          </div>
+        </td>
+        <td><span class="dpi-id-pill mono-text">${escapeHtml(row.dpi_id)}</span></td>
+        <td>${escapeHtml(row.dpi)}</td>
+        <td>
+          <div class="model-cell">
+            <span class="model-main">${escapeHtml(row.modello)}</span>
+            <span class="model-sub">Scheda modello in uso</span>
+          </div>
+        </td>
+        <td>${escapeHtml(row.norma)}</td>
+        <td><span class="primary-text mono-text">${escapeHtml(row.matricola)}</span></td>
+        <td>
+          <div class="name-stack">
+            <span class="primary-text">${formatDate(row.prossima_revisione)}</span>
+            <span class="secondary-text">${formatReviewCountdown(flags.reviewDays)}</span>
+          </div>
+        </td>
+        <td>${getManualBadge(row)}</td>
+        <td>${getReviewBadge(row)}</td>
+        <td>
+          <div class="status-block">
+            ${badge(flags.generalStatus, flags.generalClass)}
+            <span class="status-sub">${flags.complete ? 'Record pronto' : flags.attention ? 'Richiede revisione' : 'Priorità alta'}</span>
+          </div>
+        </td>
+        <td>
+          <div class="actions-inline">
+            <button class="action-btn" data-action="detail" data-id="${row.id}">Apri dettaglio</button>
+            ${renderFileButton('Apri manuale', hasManual(row), row.manuale, 'ghost-btn')}
+            ${renderFileButton('Apri revisione', hasReview(row), row.revisione, 'ghost-btn')}
+          </div>
+        </td>
+      `;
+      elements.tableBody.appendChild(tr);
+    });
+
+    elements.tableMeta.textContent = `${rows.length} record visualizzati`;
+    renderStats(rows);
+    attachActionHandlers();
+  }
+
+  function detailRow(label, value, full = false) {
+    return `
+      <div class="detail-card ${full ? 'full' : ''}">
+        <div class="detail-label">${label}</div>
+        <div class="detail-value">${value}</div>
+      </div>
+    `;
+  }
+
+  function fileValue(value, available) {
+    if (!available) {
+      return '<span class="badge danger">MANCANTE</span>';
+    }
+    return `<a href="#" class="file-link" data-drawer-file="${escapeHtml(value)}">${escapeHtml(value)}</a>`;
+  }
+
+  function setSelectedRow(rowId) {
+    selectedRowId = rowId;
+    document.querySelectorAll('#tableBody tr').forEach((tr) => {
+      tr.classList.toggle('row-selected', tr.dataset.id === String(rowId));
+    });
+  }
+
+  function buildNarrative(row, flags) {
+    if (flags.complete) {
+      return `Il record ${row.dpi_id} risulta completo: manuale disponibile, revisione presente e scheda pronta per consultazione, controllo o fascicolo.`;
+    }
+    if (flags.attention) {
+      return `Il record ${row.dpi_id} è documentato a livello manuale, ma richiede ancora il completamento della revisione. È quindi in attenzione operativa.`;
+    }
+    return `Il record ${row.dpi_id} richiede intervento prioritario, perché manca un elemento documentale essenziale per la gestione completa.`;
+  }
+
+  function buildActionsText(row, flags) {
+    if (flags.complete) {
+      return 'Esito fascicolo: pronto. Il record è presentabile, verificabile e già leggibile in chiave operativa.';
+    }
+    if (flags.attention) {
+      return 'Esito fascicolo: da completare. Recuperare revisione e consolidare il set documentale del DPI.';
+    }
+    return 'Esito fascicolo: non pronto. Collegare prima la base documentale corretta e poi rivalutare il record.';
+  }
+
+  function openDrawer(row) {
+    const flags = getRowFlags(row);
+    setSelectedRow(row.id);
+
+    elements.drawerTitle.textContent = row.modello;
+    elements.drawerSubtitle.textContent = `${row.operatore} · ${row.dpi_id} · matricola ${row.matricola}`;
+
+    elements.drawerTopBadges.innerHTML = [
+      badge(flags.generalStatus, flags.generalClass),
+      hasManual(row) ? badge('MANUALE OK', 'ok') : badge('MANUALE MANCANTE', 'danger'),
+      hasReview(row) ? badge('REVISIONE OK', 'ok') : badge('REVISIONE MANCANTE', 'warning')
+    ].join('');
+
+    elements.drawerNarrative.textContent = buildNarrative(row, flags);
+    elements.drawerActionsText.textContent = buildActionsText(row, flags);
+
+    elements.drawerContent.innerHTML = [
+      detailRow('Operatore', escapeHtml(row.operatore)),
+      detailRow('DPI ID', `<span class="mono-text">${escapeHtml(row.dpi_id)}</span>`),
+      detailRow('Categoria DPI', escapeHtml(row.dpi)),
+      detailRow('Modello', escapeHtml(row.modello)),
+      detailRow('Norma', escapeHtml(row.norma)),
+      detailRow('Matricola', `<span class="mono-text">${escapeHtml(row.matricola)}</span>`),
+      detailRow('Prossima revisione', `${formatDate(row.prossima_revisione)}<br><span class="secondary-text">${formatReviewCountdown(flags.reviewDays)}</span>`),
+      detailRow('Stato generale', badge(flags.generalStatus, flags.generalClass)),
+      detailRow('Stato manuale', hasManual(row) ? badge('OK', 'ok') : badge('MANCANTE', 'danger')),
+      detailRow('Stato revisione', hasReview(row) ? badge('OK', 'ok') : badge('MANCANTE', 'warning')),
+      detailRow('File manuale', fileValue(row.manuale, hasManual(row)), true),
+      detailRow('File revisione', fileValue(row.revisione === 'nessuna' ? 'nessuna' : row.revisione, hasReview(row)), true)
+    ].join('');
+
+    elements.detailDrawer.classList.add('open');
+    elements.drawerBackdrop.classList.add('open');
+    elements.detailDrawer.setAttribute('aria-hidden', 'false');
+
+    attachDrawerFileHandlers();
+  }
+
+  function closeDrawer() {
+    elements.detailDrawer.classList.remove('open');
+    elements.drawerBackdrop.classList.remove('open');
+    elements.detailDrawer.setAttribute('aria-hidden', 'true');
+    selectedRowId = null;
+    setSelectedRow(null);
+  }
+
+  function simulateOpenFile(filename) {
+    alert(`Demo file:\n${filename}`);
+  }
+
+  function attachDrawerFileHandlers() {
+    elements.drawerContent.querySelectorAll('[data-drawer-file]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        simulateOpenFile(link.getAttribute('data-drawer-file'));
+      });
+    });
+  }
+
+  function attachActionHandlers() {
+    document.querySelectorAll('[data-action="detail"]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const row = demoRows.find((item) => String(item.id) === button.dataset.id);
+        if (row) openDrawer(row);
+      });
+    });
+
+    document.querySelectorAll('.ghost-btn[data-file]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const filename = button.getAttribute('data-file');
+        if (filename) simulateOpenFile(filename);
+      });
+    });
+  }
+
+  function setQuickFilter(value) {
+    activeQuickFilter = value;
+    document.querySelectorAll('.quick-chip').forEach((chip) => {
+      chip.classList.toggle('active', chip.dataset.quick === value);
+    });
+    renderTable();
+  }
+
+  async function loadDashboardData() {
+    const possiblePaths = ['./dashboard_data.json'];
+
+    for (const path of possiblePaths) {
+      try {
+        const response = await fetch(path + '?v=' + Date.now(), { cache: 'no-store' });
+        if (!response.ok) continue;
+
+        const payload = await response.json();
+
+        if (payload && Array.isArray(payload.rows) && payload.rows.length > 0) {
+          demoRows = payload.rows.map((row, index) => ({
+            id: index + 1,
+            dpi_id: row.dpi_id ?? `DPI-${index + 1}`,
+            operatore: row.operatore ?? 'Operatore non disponibile',
+            dpi: row.dpi ?? 'DPI',
+            modello: row.modello ?? 'Modello non disponibile',
+            norma: row.norma ?? '-',
+            matricola: row.matricola ?? '-',
+            manuale: row.manuale ?? 'nessuna',
+            manuale_ok: row.manuale_ok ?? 'NO',
+            revisione: row.revisione ?? 'nessuna',
+            revisione_ok: row.revisione_ok ?? 'NO',
+            prossima_revisione: row.prossima_revisione ?? '2027-03-11'
+          }));
+
+          if (elements.sectionMeta && payload.generated_at) {
+            elements.sectionMeta.textContent = `Dataset reale caricato · aggiornato ${payload.generated_at}`;
+          }
+
+          if (elements.heroSummary && payload.summary) {
+            elements.heroSummary.textContent = payload.summary;
+          }
+
+          if (elements.tableMeta && payload.final_status) {
+            elements.tableMeta.textContent = `${demoRows.length} record visualizzati · stato export ${payload.final_status}`;
+          }
+
+          return true;
+        }
+      } catch (error) {
+      }
+    }
+
+    return false;
+  }
+
+  async function bootDashboard() {
+    await loadDashboardData();
+    renderTable();
+  }
+
+  document.querySelectorAll('.quick-chip').forEach((chip) => {
+    chip.addEventListener('click', () => setQuickFilter(chip.dataset.quick));
+  });
+
+  elements.searchInput.addEventListener('input', renderTable);
+  elements.statusFilter.addEventListener('change', renderTable);
+  elements.drawerClose.addEventListener('click', closeDrawer);
+  elements.drawerBackdrop.addEventListener('click', closeDrawer);
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeDrawer();
+  });
+
+  bootDashboard();
+</script>
+</body>
+</html>

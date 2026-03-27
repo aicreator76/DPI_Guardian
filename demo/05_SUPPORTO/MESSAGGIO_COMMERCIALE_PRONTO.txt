@@ -1,0 +1,13 @@
+DPI Guardian è una demo operativa pensata per mostrare in modo semplice e immediato il controllo documentale dei DPI.
+
+Con un doppio click l’utente apre la dashboard, esegue il controllo demo e genera automaticamente un report finale.
+
+La struttura è chiara, portabile e pronta per essere estesa in ambiente reale con archivio operatori, scadenziari, verifiche e output per cliente.
+
+Questa demo mostra il concetto prodotto:
+- avvio semplice
+- controllo immediato
+- report automatico
+- presentazione professionale
+
+DPI Guardian trasforma la gestione DPI in un flusso ordinato, leggibile e dimostrabile anche in sede commerciale.
