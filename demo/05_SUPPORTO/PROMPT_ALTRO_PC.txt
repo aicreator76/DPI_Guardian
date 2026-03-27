@@ -1,0 +1,30 @@
+AELIS, sto eseguendo DPI Guardian su un altro PC.
+
+Struttura:
+G:\DPI_GUARDIAN_PRESENTAZIONE
+
+Contiene:
+- 01_DEMO_DATI -> file dati demo
+- 02_OUTPUT -> report generato
+- 04_SCRIPT -> script PowerShell
+- START_DEMO.bat -> avvio demo
+- dashboard già pronta da usare
+
+Obiettivo:
+mostrare una demo cliente semplice, pulita e senza modifiche tecniche pesanti.
+
+Regole:
+- non toccare CESARE
+- non cambiare struttura cartelle
+- usare quello che c'è già di buono
+- se qualcosa non parte, correggere solo path o avvio minimo
+
+Cosa fare:
+1. verificare che G:\DPI_GUARDIAN_PRESENTAZIONE sia accessibile
+2. lanciare START_DEMO.bat
+3. controllare che la dashboard si apra
+4. controllare che il report venga creato in 02_OUTPUT
+5. se serve, aiutarmi solo con fix minimi e comandi semplici
+
+Obiettivo finale:
+demo cliente funzionante in pochi minuti.

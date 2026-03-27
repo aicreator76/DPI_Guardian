@@ -1,0 +1,17 @@
+﻿# Generated outputs
+demo/02_OUTPUT/*
+!demo/02_OUTPUT/.gitkeep
+
+# Runtime dashboard sync file
+demo/03_PRESENTAZIONE/console/dashboard_data.json
+
+# Temp / backup
+*.tmp
+*.bak
+*.old
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store
+.~lock.*
