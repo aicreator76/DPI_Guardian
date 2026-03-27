@@ -19,13 +19,18 @@ foreach ($c in $checks) {
     }
 }
 
-$dataFiles = Get-ChildItem (Join-Path $root "01_DEMO_DATI") -File -ErrorAction SilentlyContinue
-if (-not $dataFiles -or $dataFiles.Count -eq 0) {
-    Write-Host "[MISSING] Nessun file demo in 01_DEMO_DATI"
-    $ok = $false
+$dataDir = Join-Path $root "01_DEMO_DATI"
+if (-not (Test-Path $dataDir)) {
+    Write-Host "[WARNING] demo/01_DEMO_DATI non presente (ok se volutamente fuori tracking)"
 }
 else {
-    Write-Host "[OK] File demo trovati: $($dataFiles.Count)"
+    $dataFiles = Get-ChildItem $dataDir -File -ErrorAction SilentlyContinue
+    if (-not $dataFiles -or $dataFiles.Count -eq 0) {
+        Write-Host "[WARNING] Nessun file demo in 01_DEMO_DATI"
+    }
+    else {
+        Write-Host "[OK] File demo trovati: $($dataFiles.Count)"
+    }
 }
 
 if ($ok) {

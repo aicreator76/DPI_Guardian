@@ -1,4 +1,5 @@
-$root = "G:\DPI_GUARDIAN_PRESENTAZIONE"
+# Root demo = cartella "demo" (portabile su qualunque PC)
+$root = Split-Path -Parent $PSScriptRoot
 
 $datiDir = Join-Path $root "01_DEMO_DATI"
 $outputDir = Join-Path $root "02_OUTPUT"
