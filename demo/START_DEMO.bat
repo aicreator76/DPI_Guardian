@@ -1,13 +1,14 @@
 @echo off
-setlocal
+setlocal EnableExtensions
 
 title DPI Guardian Demo
 cd /d "%~dp0"
 
 set "ROOT=%~dp0"
-set "DASHBOARD=%ROOT%03_PRESENTAZIONE\console\index.html"
-set "REPORT=%ROOT%02_OUTPUT\DPI_GUARDIAN_DEMO_REPORT.txt"
-set "DEMO_PS1=%ROOT%04_SCRIPT\DPI_GUARDIAN_RUN.ps1"
+if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
+
+set "LOCAL_RUN=%ROOT%\04_SCRIPT\run_local.ps1"
+set "REPORT=%ROOT%\02_OUTPUT\DPI_GUARDIAN_DEMO_REPORT.txt"
 
 echo ==========================================
 echo         DPI GUARDIAN DEMO AVVIO
@@ -15,21 +16,19 @@ echo ==========================================
 echo ROOT: %ROOT%
 echo.
 
-if exist "%DASHBOARD%" (
-    echo [OK] Avvio dashboard...
-    start "" "%DASHBOARD%"
-) else (
-    echo [WARNING] Dashboard non trovata:
-    echo %DASHBOARD%
+if not exist "%LOCAL_RUN%" (
+    echo [ERRORE] Script local run non trovato:
+    echo %LOCAL_RUN%
     echo.
+    pause
+    exit /b 1
 )
 
-if exist "%DEMO_PS1%" (
-    echo [OK] Avvio script demo...
-    powershell -ExecutionPolicy Bypass -NoProfile -File "%DEMO_PS1%"
-) else (
-    echo [ERRORE] Script demo non trovato:
-    echo %DEMO_PS1%
+echo [OK] Avvio flusso demo completo...
+powershell -ExecutionPolicy Bypass -NoProfile -File "%LOCAL_RUN%"
+if errorlevel 1 (
+    echo.
+    echo [ERRORE] Esecuzione demo fallita.
     echo.
     pause
     exit /b 1
@@ -40,18 +39,16 @@ if exist "%REPORT%" (
     echo [OK] Apertura report...
     start "" notepad "%REPORT%"
 ) else (
-    echo [ERRORE] Report non trovato:
+    echo [WARNING] Report non trovato:
     echo %REPORT%
-    echo.
-    pause
-    exit /b 1
 )
 
 echo.
 echo ==========================================
 echo DPI GUARDIAN DEMO COMPLETATA
-echo Dashboard aperta - Report generato
+echo Dashboard aggiornata - Report disponibile
 echo ==========================================
 echo.
 pause
 endlocal
+exit /b 0

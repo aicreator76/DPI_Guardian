@@ -78,14 +78,24 @@ Write-Host ""
 Write-Host "=== FINE CONTROLLO ==="
 Write-Host ""
 if (Test-Path $reportFile) {
+    $finalEsito = "OK"
+    $finalStatoDemo = "PRESENTABILE"
+    $dashboardCheck = "VERIFICARE AVVIO START_DEMO.bat"
+
+    if (-not (Test-Path $operatoriDir)) {
+        $finalEsito = "ATTENZIONE"
+        $finalStatoDemo = "PRESENTABILE CON WARNING"
+    }
+
     Add-Content -Path $reportFile -Value ""
     Add-Content -Path $reportFile -Value "=========================================="
-    Add-Content -Path $reportFile -Value "ESITO DEMO: OK"
-    Add-Content -Path $reportFile -Value "Dashboard collegata: VERIFICARE AVVIO START_DEMO.bat"
+    Add-Content -Path $reportFile -Value "ESITO DEMO: $finalEsito"
+    Add-Content -Path $reportFile -Value "Dashboard collegata: $dashboardCheck"
     Add-Content -Path $reportFile -Value "Report generato: SI"
-    Add-Content -Path $reportFile -Value "Stato demo: PRESENTABILE"
+    Add-Content -Path $reportFile -Value "Stato demo: $finalStatoDemo"
     Add-Content -Path $reportFile -Value "=========================================="
-}# =========================
+}
+# =========================
 # DASHBOARD JSON EXPORT (aligned to current old script)
 # Output: ..\02_OUTPUT\dashboard_data.json
 # =========================
