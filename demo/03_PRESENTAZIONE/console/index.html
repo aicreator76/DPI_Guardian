@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -844,7 +844,62 @@
         align-items: stretch;
       }
     }
-  </style>
+      .drawer-editor-panel {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #fffdf8 0%, #fff8ee 100%);
+      border-radius: 16px;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .drawer-editor-panel[hidden] {
+      display: none;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .editor-grid .field {
+      flex: unset;
+    }
+
+    .editor-grid .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .editor-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .soft-ok {
+      color: var(--success);
+      font-weight: 900;
+    }
+
+    .soft-warning {
+      color: var(--warning);
+      font-weight: 900;
+    }
+
+    @media (max-width: 700px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+</style>
 </head>
 <body>
   <div class="page">
@@ -852,34 +907,34 @@
       <div>
         <h1>SISTEMA FASCICOLO DPI PRO</h1>
         <p class="subtitle">
-          Demo interattiva locale per il controllo DPI di operatori, manuali e revisioni.
-          Versione rifinita per presentazione: lettura rapida, scheda operativa e valutazione fascicolo.
-        </p>
+  Sistema prodotto per il controllo DPI aziendale: fascicolo tecnico, revisione, manuali, documentazione di sessione
+  e completamento dati mancanti. Versione operativa strutturata per consultazione, verifica e preparazione fascicoli.
+</p>
       </div>
       <div class="header-right">
         <div class="target-chip">Target: aziende con DPI</div>
-        <div class="status-chip">Stato: V1 vendibile</div>
+        <div class="status-chip">Stato: Prodotto strutturato</div>
       </div>
     </div>
 
     <section class="hero-strip">
       <article class="hero-card">
-        <h2>Situazione DPI</h2>
+        <h2>Situazione prodotti</h2>
         <p id="heroSummary">
-          La vista corrente mostra 5 DPI, con 1 record completo, 4 in attenzione e 4 con revisione ancora mancante.
-        </p>
+  La vista corrente mostra prodotti strutturati del fascicolo, con distinzione tra record completi e record da completare.
+</p>
       </article>
 
       <article class="summary-card">
-        <h2>Quadro di controllo</h2>
+        <h2>Quadro operativo</h2>
         <p>Vista sintetica per confronto immediato durante presentazione e verifica operativa.</p>
         <div class="summary-grid">
           <div class="summary-mini">
-            <div class="summary-mini-label">Manuali OK</div>
+            <div class="summary-mini-label">Documentazione base</div>
             <div class="summary-mini-value" id="miniManualiOk">0</div>
           </div>
           <div class="summary-mini">
-            <div class="summary-mini-label">Revisioni OK</div>
+            <div class="summary-mini-label">Revisioni eseguite</div>
             <div class="summary-mini-value" id="miniRevisioniOk">0</div>
           </div>
         </div>
@@ -906,7 +961,7 @@
       </article>
 
       <article class="stat-card">
-        <div class="stat-label">Revisione mancante</div>
+        <div class="stat-label">Record da completare</div>
         <div class="stat-value" id="statRevMancante">0</div>
         <div class="stat-note">DPI che richiedono ancora verifica o revisione</div>
       </article>
@@ -932,29 +987,29 @@
 
     <div class="quick-filters">
       <button class="quick-chip active" data-quick="tutti">Tutti</button>
-      <button class="quick-chip" data-quick="rossini">Completi</button>
-      <button class="quick-chip" data-quick="spadaro">Da verificare</button>
-      <button class="quick-chip" data-quick="manuali-ok">Manuali OK</button>
-      <button class="quick-chip" data-quick="revisioni-ok">Revisioni OK</button>
+      <button class="quick-chip" data-quick="completi">Completi</button>
+      <button class="quick-chip" data-quick="da-verificare">Da verificare</button>
+      <button class="quick-chip" data-quick="manuali-ok">Documentazione base</button>
+      <button class="quick-chip" data-quick="revisioni-ok">Revisioni eseguite</button>
       <button class="quick-chip" data-quick="revisioni-mancanti">Revisioni mancanti</button>
     </div>
 
     <div class="section-intro">
       <div class="section-intro-text">
-        <h2>Centrale controllo DPI</h2>
+        <h2>Centrale controllo prodotti DPI</h2>
         <p>Controllo DPI aziendale · documenti, revisioni, fascicolo e verifica rapida</p>
       </div>
-      <div class="section-intro-meta" id="sectionMeta">Dataset demo consolidato</div>
+      <div class="section-intro-meta" id="sectionMeta">Dataset prodotto strutturato</div>
     </div>
 
     <section class="table-wrap">
       <div class="table-header">
         <div>
-          <h2 class="table-title">Registro DPI aziendale</h2>
+          <h2 class="table-title">Registro prodotti DPI</h2>
           <div class="table-meta" id="tableMeta">0 record visualizzati</div>
         </div>
         <div class="legend">
-          <span>Lettura rapida di operatori, modelli, manuali e revisioni con vista utile per fascicolo e controllo.</span>
+          <span>Lettura rapida di operatori, modelli, documenti e stato prodotto con vista utile per fascicolo e controllo.</span>
         </div>
       </div>
 
@@ -979,14 +1034,14 @@
         </table>
       </div>
 
-      <div class="empty-state" id="emptyState" hidden>Nessun risultato con i filtri attuali.</div>
+      <div class="empty-state" id="emptyState" hidden>Nessun prodotto visibile con i filtri attuali.</div>
     </section>
 
     <section class="fascicolo-band">
       <div>
-        <h3>Esito fascicoli demo</h3>
+        <h3>Esito fascicoli prodotto</h3>
         <p id="fascicoloNarrative">
-          La demo consente una lettura immediata di record pronti e record da completare, utile per mostrare valore pratico senza appesantire la presentazione.
+          Vista prodotto strutturata per distinguere record completi e record da completare, con lettura immediata utile a fascicolo, controllo e consulenza.
         </p>
       </div>
       <div class="fascicolo-summary">
@@ -1002,7 +1057,7 @@
     </section>
 
     <section class="footer-notes">
-      <h3>Valore del software in demo</h3>
+      <h3>Valore del software</h3>
       <ul>
         <li>lettura immediata dello stato documentale per ogni DPI</li>
         <li>distinzione chiara tra DPI completi, da verificare e incompleti</li>
@@ -1016,8 +1071,8 @@
   <aside class="drawer" id="detailDrawer" aria-hidden="true">
     <div class="drawer-header">
       <div>
-        <h3 class="drawer-title" id="drawerTitle">Dettaglio DPI</h3>
-        <p class="drawer-subtitle" id="drawerSubtitle">Scheda operativa completa</p>
+        <h3 class="drawer-title" id="drawerTitle">Dettaglio prodotto DPI</h3>
+        <p class="drawer-subtitle" id="drawerSubtitle">Scheda prodotto operativa</p>
       </div>
       <button class="drawer-close" id="drawerClose" aria-label="Chiudi dettaglio">×</button>
     </div>
@@ -1026,92 +1081,61 @@
       <div class="drawer-top-badges" id="drawerTopBadges"></div>
 
       <div class="drawer-panel">
-        <h4>Stato documentale</h4>
-        <p id="drawerNarrative">Questo record è pronto per controllo documentale e consultazione rapida.</p>
+        <h4>Stato prodotto</h4>
+        <p id="drawerNarrative">Questo record mostra lo stato prodotto del DPI e il livello di completezza documentale disponibile.</p>
       </div>
 
       <div class="detail-grid" id="drawerContent"></div>
+      <div class="drawer-panel drawer-editor-panel" id="drawerEditorPanel" hidden>
+        <h4>Completa dati mancanti</h4>
+
+        <div class="editor-grid">
+          <div class="field">
+            <label class="label" for="editorMatricola">Matricola / seriale</label>
+            <input id="editorMatricola" type="text" placeholder="Inserisci matricola o seriale" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="editorNorma">Norma</label>
+            <input id="editorNorma" type="text" placeholder="Inserisci norma" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="editorProduttore">Produttore</label>
+            <input id="editorProduttore" type="text" placeholder="Inserisci produttore" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="editorVariante">Variante</label>
+            <input id="editorVariante" type="text" placeholder="Inserisci variante se presente" />
+          </div>
+
+          <div class="field full">
+            <label class="label" for="editorNota">Nota operativa</label>
+            <input id="editorNota" type="text" placeholder="Nota operativa" />
+          </div>
+        </div>
+
+        <div class="editor-actions">
+          <button type="button" class="ghost-btn" id="editorCancel">Chiudi editor</button>
+          <button type="button" class="action-btn" id="editorSave">Salva dati locali</button>
+        </div>
+
+        <p class="editor-note">
+          Modifica locale immediata nella dashboard. Per renderla definitiva devi poi riscrivere
+          <span class="mono-text">dashboard_data.json</span>.
+        </p>
+      </div>
 
       <div class="drawer-panel">
-        <h4>Esito fascicolo</h4>
-        <p id="drawerActionsText">Consultazione scheda, verifica documenti, preparazione fascicolo e supporto a controllo RSPP.</p>
+        <h4>Prossime azioni</h4>
+        <p id="drawerActionsText">Consultazione scheda prodotto, verifica documenti, completamento dati mancanti e preparazione fascicolo operativo.</p>
       </div>
     </div>
   </aside>
 
  <script>
-  let demoRows = [
-    {
-      id: 1,
-      dpi_id: 'DPI-R001',
-      operatore: 'Rossini Davide',
-      dpi: 'Imbracatura',
-      modello: 'ERGO CLIP PLUS',
-      norma: 'EN361',
-      matricola: '22102 02008',
-      manuale: 'instruction-manual_ergo_serie.pdf',
-      manuale_ok: 'SI',
-      revisione: 'nessuna',
-      revisione_ok: 'NO',
-      prossima_revisione: '2027-03-11'
-    },
-    {
-      id: 2,
-      dpi_id: 'DPI-R002',
-      operatore: 'Rossini Davide',
-      dpi: 'Connettore',
-      modello: 'MULTIGRIP',
-      norma: 'EN362',
-      matricola: '205',
-      manuale: 'instruction-manual_multigrip.pdf',
-      manuale_ok: 'SI',
-      revisione: 'nessuna',
-      revisione_ok: 'NO',
-      prossima_revisione: '2027-03-11'
-    },
-    {
-      id: 3,
-      dpi_id: 'DPI-S001',
-      operatore: 'Spadaro',
-      dpi: 'Cordino con assorbitore',
-      modello: 'FallSorb Y-Lany',
-      norma: 'EN355',
-      matricola: '0441-818803022',
-      manuale: 'fallsorb-en.pdf',
-      manuale_ok: 'SI',
-      revisione: 'nessuna',
-      revisione_ok: 'NO',
-      prossima_revisione: '2027-03-11'
-    },
-    {
-      id: 4,
-      dpi_id: 'DPI-S002',
-      operatore: 'Spadaro',
-      dpi: 'Imbracatura',
-      modello: 'ERGO CLIP PLUS',
-      norma: 'EN361',
-      matricola: '8223V0222',
-      manuale: 'instruction-manual_ergo_serie.pdf',
-      manuale_ok: 'SI',
-      revisione: 'spadaro_ergo_plus_revisione_2026-03-11.jpg.png',
-      revisione_ok: 'SI',
-      prossima_revisione: '2027-03-11'
-    },
-    {
-      id: 5,
-      dpi_id: 'DPI-S003',
-      operatore: 'Spadaro',
-      dpi: 'Cordino con assorbitore',
-      modello: 'FallSorb Y-Lany',
-      norma: 'EN355',
-      matricola: '0441-818803022',
-      manuale: 'fallsorb-en.pdf',
-      manuale_ok: 'SI',
-      revisione: 'nessuna',
-      revisione_ok: 'NO',
-      prossima_revisione: '2027-03-11'
-    }
-  ];
+  let demoRows = [];
 
   const elements = {
     searchInput: document.getElementById('searchInput'),
@@ -1138,7 +1162,15 @@
     drawerTopBadges: document.getElementById('drawerTopBadges'),
     drawerContent: document.getElementById('drawerContent'),
     drawerNarrative: document.getElementById('drawerNarrative'),
-    drawerActionsText: document.getElementById('drawerActionsText')
+    drawerActionsText: document.getElementById('drawerActionsText'),
+    drawerEditorPanel: document.getElementById('drawerEditorPanel'),
+    editorMatricola: document.getElementById('editorMatricola'),
+    editorNorma: document.getElementById('editorNorma'),
+    editorProduttore: document.getElementById('editorProduttore'),
+    editorVariante: document.getElementById('editorVariante'),
+    editorNota: document.getElementById('editorNota'),
+    editorCancel: document.getElementById('editorCancel'),
+    editorSave: document.getElementById('editorSave')
   };
 
   let selectedRowId = null;
@@ -1151,6 +1183,11 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  function isPlaceholder(value) {
+    const text = String(value ?? '').trim().toLowerCase();
+    return !text || text === 'nessuna' || text.includes('da confermare') || text === '-';
   }
 
   function hasManual(row) {
@@ -1185,29 +1222,44 @@
     return `${days} giorni al controllo`;
   }
 
+  function getMissingFields(row) {
+    const missing = [];
+    if (isPlaceholder(row.matricola)) missing.push('matricola/seriale');
+    if (isPlaceholder(row.norma)) missing.push('norma');
+    if (!row.produttore || isPlaceholder(row.produttore)) missing.push('produttore');
+    if (!hasManual(row)) missing.push('manuale specifico');
+    if (!hasReview(row)) missing.push('revisione');
+    if (!row.scheda_prodotto_specifica) missing.push('scheda prodotto');
+    return missing;
+  }
+
   function getRowFlags(row) {
     const manualMissing = !hasManual(row);
     const reviewMissing = !hasReview(row);
     const reviewDays = daysUntil(row.prossima_revisione);
+    const explicit = String(row.stato_generale ?? '').trim().toUpperCase();
 
-    let generalStatus = 'COMPLETO';
-    let generalClass = 'ok';
+    let generalStatus = 'DA COMPLETARE';
+    let generalClass = 'warning';
+    let complete = false;
+    let critical = false;
 
-    if (manualMissing) {
+    if (explicit === 'OK' || explicit === 'COMPLETO' || explicit === 'PRONTO') {
+      generalStatus = 'PRONTO';
+      generalClass = 'ok';
+      complete = true;
+    } else if (explicit === 'CRITICO') {
       generalStatus = 'CRITICO';
       generalClass = 'danger';
-    } else if (reviewMissing) {
-      generalStatus = 'ATTENZIONE';
-      generalClass = 'warning';
+      critical = true;
     }
 
     return {
       manualMissing,
       reviewMissing,
       reviewDays,
-      attention: !manualMissing && reviewMissing,
-      critical: manualMissing,
-      complete: !manualMissing && !reviewMissing,
+      critical,
+      complete,
       generalStatus,
       generalClass
     };
@@ -1227,10 +1279,10 @@
 
   function applyQuickFilter(rows) {
     switch (activeQuickFilter) {
-      case 'rossini':
-        return rows.filter(row => row.operatore === 'Rossini Davide');
-      case 'spadaro':
-        return rows.filter(row => row.operatore === 'Spadaro');
+      case 'completi':
+        return rows.filter(row => getRowFlags(row).complete);
+      case 'da-verificare':
+        return rows.filter(row => !getRowFlags(row).complete);
       case 'manuali-ok':
         return rows.filter(row => hasManual(row));
       case 'revisioni-ok':
@@ -1250,7 +1302,11 @@
       const flags = getRowFlags(row);
       const searchText = [
         row.operatore,
+        row.produttore,
+        row.famiglia_prodotto,
+        row.modello_display,
         row.modello,
+        row.variante,
         row.dpi,
         row.matricola,
         row.dpi_id
@@ -1270,7 +1326,7 @@
           matchesStatus = hasManual(row);
           break;
         case 'critici':
-          matchesStatus = flags.critical;
+          matchesStatus = !flags.complete;
           break;
         default:
           matchesStatus = true;
@@ -1286,38 +1342,26 @@
     const uniqueOperators = new Set(rows.map(r => r.operatore)).size;
     const manualiOk = rows.filter(r => hasManual(r)).length;
     const revisioniOk = rows.filter(r => hasReview(r)).length;
-    const revisioneMancante = rows.filter(r => !hasReview(r)).length;
     const completi = rows.filter(r => getRowFlags(r).complete).length;
+    const daCompletare = rows.length - completi;
 
     if (elements.statOperatori) elements.statOperatori.textContent = uniqueOperators;
     if (elements.statDpi) elements.statDpi.textContent = rows.length;
     if (elements.statManualiOk) elements.statManualiOk.textContent = manualiOk;
-    if (elements.statRevMancante) elements.statRevMancante.textContent = revisioneMancante;
+    if (elements.statRevMancante) elements.statRevMancante.textContent = daCompletare;
     if (elements.miniManualiOk) elements.miniManualiOk.textContent = manualiOk;
     if (elements.miniRevisioniOk) elements.miniRevisioniOk.textContent = revisioniOk;
     if (elements.fascicoloPronti) elements.fascicoloPronti.textContent = completi;
-    if (elements.fascicoloDaCompletare) elements.fascicoloDaCompletare.textContent = rows.length - completi;
-
-    if (!rows.length) {
-      if (elements.heroSummary) {
-        elements.heroSummary.textContent = 'I filtri attuali non mostrano record. Ripristina la vista completa per tornare al quadro generale.';
-      }
-      if (elements.fascicoloNarrative) {
-        elements.fascicoloNarrative.textContent = 'Nessun fascicolo visibile con i filtri correnti.';
-      }
-      return;
-    }
-
-    const attenzioni = rows.filter(r => getRowFlags(r).attention).length;
+    if (elements.fascicoloDaCompletare) elements.fascicoloDaCompletare.textContent = daCompletare;
 
     if (elements.heroSummary) {
       elements.heroSummary.textContent =
-        `La vista corrente mostra ${rows.length} DPI, con ${completi} record completi, ${attenzioni} in attenzione e ${revisioneMancante} con revisione ancora mancante.`;
+        `La vista corrente mostra ${rows.length} prodotti, con ${completi} record pronti e ${daCompletare} da completare.`;
     }
 
     if (elements.fascicoloNarrative) {
       elements.fascicoloNarrative.textContent =
-        `${completi} record risultano già presentabili come fascicolo completo, mentre ${rows.length - completi} richiedono ancora completamento documentale o revisione.`;
+        `${completi} record risultano pronti a fascicolo, mentre ${daCompletare} richiedono ancora completamento dati o documenti specifici.`;
     }
   }
 
@@ -1326,6 +1370,11 @@
       return `<button type="button" class="${cssClass} disabled" disabled>${label}</button>`;
     }
     return `<button type="button" class="${cssClass}" data-file="${escapeHtml(filename)}">${label}</button>`;
+  }
+
+  function renderMissingButton(row) {
+    if (getRowFlags(row).complete) return '';
+    return `<button type="button" class="ghost-btn" data-action="missing" data-id="${row.id}">Completa scheda</button>`;
   }
 
   function renderTable() {
@@ -1351,8 +1400,8 @@
         <td>${escapeHtml(row.dpi)}</td>
         <td>
           <div class="model-cell">
-            <span class="model-main">${escapeHtml(row.modello)}</span>
-            <span class="model-sub">Scheda modello in uso</span>
+            <span class="model-main">${escapeHtml(row.modello_display)}</span>
+            <span class="model-sub">${escapeHtml(row.famiglia_prodotto ?? 'Scheda prodotto strutturata')}</span>
           </div>
         </td>
         <td>${escapeHtml(row.norma)}</td>
@@ -1368,14 +1417,15 @@
         <td>
           <div class="status-block">
             ${badge(flags.generalStatus, flags.generalClass)}
-            <span class="status-sub">${flags.complete ? 'Record pronto' : flags.attention ? 'Richiede revisione' : 'Priorità alta'}</span>
+            <span class="status-sub">${flags.complete ? 'Fascicolo pronto' : 'Dati da completare'}</span>
           </div>
         </td>
         <td>
           <div class="actions-inline">
-            <button class="action-btn" data-action="detail" data-id="${row.id}">Apri dettaglio</button>
-            ${renderFileButton('Apri manuale', hasManual(row), row.manuale, 'ghost-btn')}
-            ${renderFileButton('Apri revisione', hasReview(row), row.revisione, 'ghost-btn')}
+            <button class="action-btn" data-action="detail" data-id="${row.id}">Scheda prodotto</button>
+            ${renderFileButton('Documentazione base', hasManual(row), row.manuale, 'ghost-btn')}
+            ${renderFileButton('Report revisione', hasReview(row), row.revisione, 'ghost-btn')}
+            ${renderMissingButton(row)}
           </div>
         </td>
       `;
@@ -1412,34 +1462,31 @@
 
   function buildNarrative(row, flags) {
     if (flags.complete) {
-      return `Il record ${row.dpi_id} risulta completo: manuale disponibile, revisione presente e scheda pronta per consultazione, controllo o fascicolo.`;
+      return `Il record ${row.dpi_id} risulta pronto: base documentale presente, revisione disponibile e scheda prodotto leggibile per fascicolo o controllo.`;
     }
-    if (flags.attention) {
-      return `Il record ${row.dpi_id} è documentato a livello manuale, ma richiede ancora il completamento della revisione. È quindi in attenzione operativa.`;
-    }
-    return `Il record ${row.dpi_id} richiede intervento prioritario, perché manca un elemento documentale essenziale per la gestione completa.`;
+    const missing = getMissingFields(row);
+    return `Il record ${row.dpi_id} è presente nel fascicolo ma richiede ancora completamento. Mancanze principali: ${missing.join(', ')}.`;
   }
 
   function buildActionsText(row, flags) {
     if (flags.complete) {
-      return 'Esito fascicolo: pronto. Il record è presentabile, verificabile e già leggibile in chiave operativa.';
+      return 'Prossima azione: mantenimento e verifica periodica. Il record è già utilizzabile in chiave prodotto/fascicolo.';
     }
-    if (flags.attention) {
-      return 'Esito fascicolo: da completare. Recuperare revisione e consolidare il set documentale del DPI.';
-    }
-    return 'Esito fascicolo: non pronto. Collegare prima la base documentale corretta e poi rivalutare il record.';
+    return 'Prossima azione: completare i campi mancanti, confermare etichetta e consolidare il set documentale specifico.';
   }
 
   function openDrawer(row) {
     const flags = getRowFlags(row);
+    const missing = getMissingFields(row);
     setSelectedRow(row.id);
 
-    elements.drawerTitle.textContent = row.modello;
-    elements.drawerSubtitle.textContent = `${row.operatore} · ${row.dpi_id} · matricola ${row.matricola}`;
+    elements.drawerTitle.textContent = row.modello_display;
+    elements.drawerSubtitle.textContent = `${row.operatore} · ${row.dpi_id} · ${row.produttore ?? 'produttore da confermare'}`;
 
     elements.drawerTopBadges.innerHTML = [
       badge(flags.generalStatus, flags.generalClass),
-      hasManual(row) ? badge('MANUALE OK', 'ok') : badge('MANUALE MANCANTE', 'danger'),
+      badge(row.famiglia_prodotto ?? 'Famiglia non indicata', 'info'),
+      hasManual(row) ? badge('DOCUMENTAZIONE BASE OK', 'ok') : badge('DOCUMENTAZIONE BASE MANCANTE', 'danger'),
       hasReview(row) ? badge('REVISIONE OK', 'ok') : badge('REVISIONE MANCANTE', 'warning')
     ].join('');
 
@@ -1449,21 +1496,31 @@
     elements.drawerContent.innerHTML = [
       detailRow('Operatore', escapeHtml(row.operatore)),
       detailRow('DPI ID', `<span class="mono-text">${escapeHtml(row.dpi_id)}</span>`),
+      detailRow('Produttore', escapeHtml(row.produttore ?? '-')),
+      detailRow('Famiglia prodotto', escapeHtml(row.famiglia_prodotto ?? '-')),
       detailRow('Categoria DPI', escapeHtml(row.dpi)),
-      detailRow('Modello', escapeHtml(row.modello)),
+      detailRow('Modello', escapeHtml(row.modello_display)),
       detailRow('Norma', escapeHtml(row.norma)),
       detailRow('Matricola', `<span class="mono-text">${escapeHtml(row.matricola)}</span>`),
       detailRow('Prossima revisione', `${formatDate(row.prossima_revisione)}<br><span class="secondary-text">${formatReviewCountdown(flags.reviewDays)}</span>`),
       detailRow('Stato generale', badge(flags.generalStatus, flags.generalClass)),
-      detailRow('Stato manuale', hasManual(row) ? badge('OK', 'ok') : badge('MANCANTE', 'danger')),
-      detailRow('Stato revisione', hasReview(row) ? badge('OK', 'ok') : badge('MANCANTE', 'warning')),
+      detailRow('Stato verifica modello', escapeHtml(row.stato_verifica_modello ?? '-'), true),
+      detailRow('Dati da completare', missing.length ? escapeHtml(missing.join(', ')) : 'Nessuno', true),
+      detailRow('Documentazione sessione', fileValue(row.documentazione_sessione ?? 'nessuna', !!row.documentazione_sessione), true),
       detailRow('File manuale', fileValue(row.manuale, hasManual(row)), true),
-      detailRow('File revisione', fileValue(row.revisione === 'nessuna' ? 'nessuna' : row.revisione, hasReview(row)), true)
+      detailRow('File revisione', fileValue(row.revisione, hasReview(row)), true),
+      detailRow('Nota operativa', escapeHtml(row.nota_operativa ?? '-'), true)
     ].join('');
 
     elements.detailDrawer.classList.add('open');
     elements.drawerBackdrop.classList.add('open');
     elements.detailDrawer.setAttribute('aria-hidden', 'false');
+
+    if (editingRowId === row.id) {
+      openInlineEditor(row);
+    } else {
+      elements.drawerEditorPanel.hidden = true;
+    }
 
     attachDrawerFileHandlers();
   }
@@ -1477,7 +1534,116 @@
   }
 
   function simulateOpenFile(filename) {
-    alert(`Demo file:\n${filename}`);
+    const clean = String(filename ?? '').trim();
+    if (!clean || clean === 'nessuna') {
+      alert('File non disponibile.');
+      return;
+    }
+
+    const url = `pdf/${encodeURIComponent(clean)}`;
+    const popup = window.open(url, '_blank');
+    if (!popup) {
+      window.location.href = url;
+    }
+  }
+
+  function syncRowStatus(row) {
+    const missing = getMissingFields(row).filter(x => x !== 'scheda prodotto' && x !== 'manuale specifico' && x !== 'revisione');
+    row.stato_generale = (missing.length === 0 && hasManual(row) && hasReview(row)) ? 'OK' : 'DA_COMPLETARE';
+  }
+
+  function fillInlineEditor(row) {
+    elements.editorMatricola.value = isPlaceholder(row.matricola) ? '' : (row.matricola ?? '');
+    elements.editorNorma.value = isPlaceholder(row.norma) ? '' : (row.norma ?? '');
+    elements.editorProduttore.value = isPlaceholder(row.produttore) ? '' : (row.produttore ?? '');
+    elements.editorVariante.value = isPlaceholder(row.variante) ? '' : (row.variante ?? '');
+    elements.editorNota.value = row.nota_operativa ?? '';
+  }
+
+  function openInlineEditor(row) {
+    editingRowId = row.id;
+    fillInlineEditor(row);
+    elements.drawerEditorPanel.hidden = false;
+  }
+
+  function closeInlineEditor() {
+    editingRowId = null;
+    elements.drawerEditorPanel.hidden = true;
+    elements.editorMatricola.value = '';
+    elements.editorNorma.value = '';
+    elements.editorProduttore.value = '';
+    elements.editorVariante.value = '';
+    elements.editorNota.value = '';
+  }
+
+  function saveInlineEditor() {
+    if (!editingRowId) return;
+
+    const row = demoRows.find(item => String(item.id) === String(editingRowId));
+    if (!row) return;
+
+    const matricola = elements.editorMatricola.value.trim();
+    const norma = elements.editorNorma.value.trim();
+    const produttore = elements.editorProduttore.value.trim();
+    const variante = elements.editorVariante.value.trim();
+    const nota = elements.editorNota.value.trim();
+
+    if (matricola) {
+      row.matricola = matricola;
+      row.seriale = matricola;
+    }
+
+    if (norma) {
+      row.norma = norma;
+    }
+
+    if (produttore) {
+      row.produttore = produttore;
+    }
+
+    row.variante = variante || null;
+    row.nota_operativa = nota || row.nota_operativa || null;
+
+    if (row.modello && row.variante) {
+      row.modello_display = `${row.modello} ${row.variante}`.trim();
+    } else {
+      row.modello_display = row.modello ?? 'Modello non disponibile';
+    }
+
+    syncRowStatus(row);
+    renderTable();
+    openDrawer(row);
+    openInlineEditor(row);
+  }
+
+  function editMissingFields(row) {
+    const nuovaMatricola = prompt('Matricola / seriale', isPlaceholder(row.matricola) ? '' : row.matricola);
+    if (nuovaMatricola !== null && nuovaMatricola.trim()) {
+      row.matricola = nuovaMatricola.trim();
+      row.seriale = nuovaMatricola.trim();
+    }
+
+    const nuovaNorma = prompt('Norma', isPlaceholder(row.norma) ? '' : row.norma);
+    if (nuovaNorma !== null && nuovaNorma.trim()) {
+      row.norma = nuovaNorma.trim();
+    }
+
+    const nuovoProduttore = prompt('Produttore', isPlaceholder(row.produttore) ? '' : row.produttore);
+    if (nuovoProduttore !== null && nuovoProduttore.trim()) {
+      row.produttore = nuovoProduttore.trim();
+    }
+
+    const nuovaNota = prompt('Nota operativa', row.nota_operativa ?? '');
+    if (nuovaNota !== null) {
+      row.nota_operativa = nuovaNota.trim();
+    }
+
+    const ancoraMancanti = getMissingFields(row).filter(x => x !== 'scheda prodotto' && x !== 'manuale specifico' && x !== 'revisione');
+    row.stato_generale = (ancoraMancanti.length === 0 && hasManual(row) && hasReview(row)) ? 'OK' : 'DA_COMPLETARE';
+
+    alert('Aggiornamento locale eseguito. Per renderlo definitivo devi riscrivere dashboard_data.json.');
+    renderTable();
+    openDrawer(row);
   }
 
   function attachDrawerFileHandlers() {
@@ -1503,6 +1669,13 @@
         if (filename) simulateOpenFile(filename);
       });
     });
+
+    document.querySelectorAll('[data-action="missing"]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const row = demoRows.find((item) => String(item.id) === button.dataset.id);
+        if (row) editMissingFields(row);
+      });
+    });
   }
 
   function setQuickFilter(value) {
@@ -1524,36 +1697,54 @@
         const payload = await response.json();
 
         if (payload && Array.isArray(payload.rows) && payload.rows.length > 0) {
-          demoRows = payload.rows.map((row, index) => ({
-            id: index + 1,
-            dpi_id: row.dpi_id ?? `DPI-${index + 1}`,
-            operatore: row.operatore ?? 'Operatore non disponibile',
-            dpi: row.dpi ?? 'DPI',
-            modello: row.modello ?? 'Modello non disponibile',
-            norma: row.norma ?? '-',
-            matricola: row.matricola ?? '-',
-            manuale: row.manuale ?? 'nessuna',
-            manuale_ok: row.manuale_ok ?? 'NO',
-            revisione: row.revisione ?? 'nessuna',
-            revisione_ok: row.revisione_ok ?? 'NO',
-            prossima_revisione: row.prossima_revisione ?? '2027-03-11'
-          }));
+          demoRows = payload.rows.map((row, index) => {
+            const modelloDisplay = [row.modello, row.variante].filter(Boolean).join(' ') || (row.modello ?? 'Modello non disponibile');
+
+            return {
+              id: row.id ?? index + 1,
+              dpi_id: row.dpi_id ?? `DPI-${index + 1}`,
+              operatore: row.operatore ?? 'Operatore non disponibile',
+              produttore: row.produttore ?? null,
+              famiglia_prodotto: row.famiglia_prodotto ?? null,
+              dpi: row.dpi ?? 'DPI',
+              modello: row.modello ?? 'Modello non disponibile',
+              modello_display: modelloDisplay,
+              variante: row.variante ?? null,
+              norma: row.norma ?? '-',
+              seriale: row.seriale ?? row.matricola ?? '-',
+              matricola: row.matricola ?? row.seriale ?? '-',
+              stato_verifica_modello: row.stato_verifica_modello ?? null,
+              manuale: row.manuale_famiglia ?? row.manuale ?? 'nessuna',
+              manuale_ok: row.manuale_ok ?? 'NO',
+              scheda_prodotto_specifica: row.scheda_prodotto_specifica ?? null,
+              revisione: row.revisione_specifica ?? row.revisione ?? 'nessuna',
+              revisione_ok: row.revisione_ok ?? 'NO',
+              documentazione_sessione: row.documentazione_sessione ?? null,
+              prossima_revisione: row.prossima_revisione ?? row.prossima_scadenza ?? '2027-03-11',
+              prossima_scadenza: row.prossima_scadenza ?? row.prossima_revisione ?? '2027-03-11',
+              stato_generale: row.stato_generale ?? 'DA_COMPLETARE',
+              nota_operativa: row.nota_operativa ?? null
+            };
+          });
 
           if (elements.sectionMeta && payload.generated_at) {
-            elements.sectionMeta.textContent = `Dataset reale caricato · aggiornato ${payload.generated_at}`;
+            elements.sectionMeta.textContent = `JSON ${payload.generated_at}`;
           }
 
           if (elements.heroSummary && payload.summary) {
             elements.heroSummary.textContent = payload.summary;
           }
 
-          if (elements.tableMeta && payload.final_status) {
-            elements.tableMeta.textContent = `${demoRows.length} record visualizzati · stato export ${payload.final_status}`;
+          if (elements.tableMeta) {
+            elements.tableMeta.textContent = payload.final_status
+              ? `${demoRows.length} record visualizzati · ${payload.final_status}`
+              : `${demoRows.length} record visualizzati`;
           }
 
           return true;
         }
       } catch (error) {
+        console.error('loadDashboardData error:', error);
       }
     }
 
@@ -1582,3 +1773,9 @@
 </script>
 </body>
 </html>
+
+
+
+
+
+
