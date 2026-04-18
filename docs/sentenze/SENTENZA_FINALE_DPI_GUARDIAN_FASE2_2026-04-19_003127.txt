@@ -1,0 +1,34 @@
+﻿DPI GUARDIAN - SENTENZA FINALE
+DATA: 2026-04-19 00:31:27
+
+ESITO:
+FASE 2 SUPERATA SUI CASI REALI.
+
+VERDETTO:
+5/5 record chiusi correttamente e confermati.
+Il GIALLO residuo e solo formativo/organizzativo:
+OPERATORI_CAMPIONE.csv non compilato.
+Voce prevista come consigliata e saltabile dall'installer.
+Il sistema collaborativo e operativo e pronto per consegna/candidato rilascio.
+
+RAMO OPERATIVO VALIDO:
+- UI viva: D:\DEFINITIVA_1\demo\03_PRESENTAZIONE\console\index_regina_fix.html
+- JSON vivo: D:\DEFINITIVA_1\demo\03_PRESENTAZIONE\console\dashboard_data.json
+- Supporto: D:\DEFINITIVA_1\demo\05_SUPPORTO
+- Snapshot candidato: E:\CLONAZIONE\SNAPSHOT_DPI_GUARDIAN_2026-04-18_181710
+
+RECORD CHIUSI:
+- DPI-C001 | Teufelberger | Ergo Click | matricola 081 | OK
+- DPI-C002 | Teufelberger | Rocky | matricola 0226 | OK
+- DPI-C003 | Teufelberger | Bandschlinge 30 kN | matricola 21/12-016524 | OK
+- DPI-C004 | KASK | SUPERPLASMA HP CE | matricola 010976 | OK
+- DPI-C005 | Teufelberger | Falldaempfer / energy absorber | matricola 0436 | OK
+
+NOTA REALE:
+Il sistema propone.
+L'RSPP conferma o corregge.
+Il dato salvato resta persistente.
+Il flusso collaborativo e validato.
+
+FIRMA OPERATIVA:
+AELIS / CESARE / RSPP
