@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
 title Installazione DPI Guardian Demo
@@ -350,7 +350,7 @@ if exist "%DEST%\03_PRESENTAZIONE\console\dashboard_data.json" (
 echo [OK] Runtime sporco pulito.
 
 set "REQ1=%DEST%\START_DEMO.bat"
-set "REQ2=%DEST%\03_PRESENTAZIONE\console\index_regina_fix.html"
+set "REQ2=%DEST%\03_PRESENTAZIONE\console\index.html"
 set "REQ3=%DEST%\04_SCRIPT\DPI_GUARDIAN_RUN.ps1"
 set "REQ4=%DEST%\04_SCRIPT\run_local.ps1"
 
@@ -394,7 +394,7 @@ if "%MISSING%"=="1" (
 
 echo.
 echo ==========================================
-echo INSTALLAZIONE COMPLETATA - CONTRATTO REGINA
+echo INSTALLAZIONE COMPLETATA
 echo Cartella installata:
 echo %DEST%
 echo ==========================================

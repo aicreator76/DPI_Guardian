@@ -1,4 +1,4 @@
-﻿# DPI Guardian
+# DPI Guardian
 
 Demo prodotto locale per il controllo DPI, con dashboard HTML, launcher rapido e report automatico generato da script PowerShell.
 
@@ -18,7 +18,7 @@ DPI Guardian mostra in modo semplice e presentabile lo stato di una demo DPI:
 - `demo/START_DEMO.bat` → launcher demo
 - `demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1` → script principale
 - `demo/04_SCRIPT/run_local.ps1` → runner locale stabile
-- `demo/03_PRESENTAZIONE/console/index_regina_fix.html` → dashboard
+- `demo/03_PRESENTAZIONE/console/index.html` → dashboard
 - `demo/02_OUTPUT/` → output generati a runtime
 
 ## Avvio rapido
@@ -26,9 +26,3 @@ Per eseguire la demo in modalità locale:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\demo\04_SCRIPT\run_local.ps1
-
-## Contratto REGINA
-- dashboard ufficiale: demo/03_PRESENTAZIONE/console/index_regina_fix.html
-- json ufficiale: demo/03_PRESENTAZIONE/console/dashboard_data.json
-- final_status atteso: PRODOTTO_STRUTTURATO_MULTIROW
-

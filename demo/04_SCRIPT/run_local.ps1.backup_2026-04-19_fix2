@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $demoRoot = Split-Path -Parent $scriptDir
@@ -6,7 +6,7 @@ $demoRoot = Split-Path -Parent $scriptDir
 $mainScript = Join-Path $scriptDir "DPI_GUARDIAN_RUN.ps1"
 $outputJson = Join-Path $demoRoot "02_OUTPUT\dashboard_data.json"
 $consoleJson = Join-Path $demoRoot "03_PRESENTAZIONE\console\dashboard_data.json"
-$dashboardHtml = Join-Path $demoRoot "03_PRESENTAZIONE\console\index_regina_fix.html"
+$dashboardHtml = Join-Path $demoRoot "03_PRESENTAZIONE\console\index.html"
 
 Write-Host ""
 Write-Host "=== DPI GUARDIAN LOCAL RUN ==="
@@ -33,7 +33,7 @@ Write-Host "[OK] JSON disponibile in output: $outputJson"
 Write-Host "[OK] JSON copiato in console: $consoleJson"
 
 if (Test-Path $dashboardHtml) {
-    Write-Host "[OK] Apertura dashboard locale REGINA..."
+    Write-Host "[OK] Apertura dashboard locale..."
     Start-Process $dashboardHtml
 }
 else {

@@ -3,7 +3,7 @@ $root = (Resolve-Path $root).Path
 
 $checks = @(
     (Join-Path $root "START_DEMO.bat"),
-    (Join-Path $root "03_PRESENTAZIONE\console\index_regina_fix.html"),
+    (Join-Path $root "03_PRESENTAZIONE\console\index.html"),
     (Join-Path $root "04_SCRIPT\DPI_GUARDIAN_RUN.ps1")
 )
 
