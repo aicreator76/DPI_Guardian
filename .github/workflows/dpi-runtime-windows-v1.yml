@@ -20,6 +20,37 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Create ephemeral synthetic runtime fixture
+        id: fixture
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $data='demo/01_DEMO_DATI'
+          $ops=Join-Path $data '08_OPERATORI_DPI/TEST_OPERATOR'
+          if (Test-Path $data) { Remove-Item -LiteralPath $data -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path $ops | Out-Null
+
+          $files=[ordered]@{
+            'TEST_OPERATOR_revisione_seriale_next_DB-A3R.txt'='SYNTHETIC TEST FIXTURE - REVISION'
+            'TEST_OPERATOR_manual_HRA.txt'='SYNTHETIC TEST FIXTURE - MANUAL'
+            'TEST_OPERATOR_certificato_HWS.txt'='SYNTHETIC TEST FIXTURE - CERTIFICATE'
+            'TEST_OPERATOR_dpi_inventario_HWB.csv'='synthetic,fixture,only'
+            'TEST_OPERATOR_inspection_signed_HAS.log'='SYNTHETIC TEST FIXTURE - INSPECTION'
+          }
+          foreach($name in $files.Keys) {
+            Set-Content -LiteralPath (Join-Path $data $name) -Value $files[$name] -Encoding UTF8
+          }
+          'Ordine,NomeCognome,RepartoFunzione,IdInterno,Dispositivo1,Dispositivo2,SerialeMatricola,UltimaVerifica,ProssimaScadenza' | Set-Content -LiteralPath (Join-Path $ops 'TEST_OPERATOR_DPI.csv') -Encoding UTF8
+          '1,TEST_OPERATOR,TEST,TEST-001,SYNTH-1,SYNTH-2,SYNTH-0001,2099-01-01,2099-12-31' | Add-Content -LiteralPath (Join-Path $ops 'TEST_OPERATOR_DPI.csv') -Encoding UTF8
+
+          $visible=@(Get-ChildItem -LiteralPath $data -Recurse -File | Where-Object { $_.FullName -notlike '*\08_OPERATORI_DPI\*' })
+          "FIXTURE_MODE=SIMULATO"
+          "SIMULATED_INPUT_COUNT=$($visible.Count)"
+          "SIMULATED_OPERATOR_DIR=$ops"
+          foreach($f in $visible|Sort-Object Name){"SIMULATED_INPUT=$($f.Name)|EXT=$($f.Extension)|SIZE=$($f.Length)|SHA256=$((Get-FileHash $f.FullName -Algorithm SHA256).Hash)"}
+          if($visible.Count -ne 5){throw "synthetic fixture expected 5 visible runtime inputs, got $($visible.Count)"}
+
       - name: Snapshot before runtime
         shell: powershell
         run: |
@@ -34,16 +65,22 @@ jobs:
           "PRE_OUTPUT_FILES=$((@(Get-ChildItem $out -File -Force).Name -join '|'))"
           "INDEX_EXISTS=$([bool](Test-Path 'demo/03_PRESENTAZIONE/console/index_regina_fix.html'))"
           "INDEX_SIZE=$((Get-Item 'demo/03_PRESENTAZIONE/console/index_regina_fix.html').Length)"
-      - name: Execute real Windows local runtime
+
+      - name: Execute real Windows local runtime with synthetic fixture
+        id: runtime
         shell: powershell
         run: |
           $ErrorActionPreference='Continue'
           & powershell -NoProfile -ExecutionPolicy Bypass -File 'demo/04_SCRIPT/run_local.ps1' *>&1 | Tee-Object -FilePath runtime-output.txt
           $code=$LASTEXITCODE
           "WINDOWS_RUNTIME_EXECUTED=YES"
+          "RUNTIME_INPUT_MODE=SIMULATO"
           "RUNTIME_EXIT_CODE=$code"
+          "exit_code=$code" >> $env:GITHUB_OUTPUT
           if ($code -ne 0) { exit $code }
-      - name: Snapshot after runtime
+
+      - name: Snapshot after synthetic runtime
+        id: post
         shell: powershell
         run: |
           $ErrorActionPreference='Stop'
@@ -57,7 +94,13 @@ jobs:
           "POST_JSON_RECORDS=$(@($d.rows).Count)"
           "POST_FINAL_STATUS=$($d.final_status)"
           "POST_OUTPUT_FILES=$((@(Get-ChildItem 'demo/02_OUTPUT' -File -Force).Name -join '|'))"
-          if (@($d.rows).Count -ne 5) { throw 'runtime JSON does not contain 5 records' }
+          "JSON_VALID=YES"
+          "POST_RUNTIME_MODE=SIMULATO"
+          if ((Get-FileHash $outJson -Algorithm SHA256).Hash -ne (Get-FileHash $consoleJson -Algorithm SHA256).Hash) { throw 'output JSON and console JSON differ after copy' }
+          if (@($d.rows).Count -ne 5) { throw 'synthetic runtime JSON does not contain expected 5 records' }
+          "json_valid=YES" >> $env:GITHUB_OUTPUT
+          "records=$(@($d.rows).Count)" >> $env:GITHUB_OUTPUT
+
       - name: Dashboard automatic checks
         shell: powershell
         run: |
@@ -69,12 +112,42 @@ jobs:
           Get-Content 'demo/03_PRESENTAZIONE/console/dashboard_data.json' -Raw | ConvertFrom-Json | Out-Null
           'DASHBOARD_JSON_REFERENCE_RESOLVES=YES'
           'VISUAL_RUNTIME=NON_VERIFICATO'
+          'DASHBOARD_CHECK_MODE=SIMULATO'
+
       - name: Post-runtime characterization
+        id: characterization
+        continue-on-error: true
         shell: pwsh
         run: ./scripts/characterization_v1.ps1
+
       - name: Post-runtime integrity
+        id: integrity
+        continue-on-error: true
         shell: pwsh
         run: ./scripts/integrity_v1.ps1
+
       - name: Isolated negative fixtures
+        id: negative
+        continue-on-error: true
         shell: pwsh
         run: ./scripts/runtime_negative_v1.ps1
+
+      - name: Fase 4A simulated verdict
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          "SIMULATO=YES"
+          "WINDOWS_RUNTIME_EXECUTED=YES"
+          "RUNTIME_EXIT_CODE=${{ steps.runtime.outputs.exit_code }}"
+          "JSON_VALID=${{ steps.post.outputs.json_valid }}"
+          "POST_JSON_RECORDS=${{ steps.post.outputs.records }}"
+          "CHARACTERIZATION_STEP=${{ steps.characterization.outcome }}"
+          "INTEGRITY_STEP=${{ steps.integrity.outcome }}"
+          "NEGATIVE_TEST_STEP=${{ steps.negative.outcome }}"
+          if ('${{ steps.runtime.outputs.exit_code }}' -ne '0') { throw 'runtime exit code is not zero' }
+          if ('${{ steps.post.outputs.json_valid }}' -ne 'YES') { throw 'post-runtime JSON invalid' }
+          if ('${{ steps.characterization.outcome }}' -ne 'success') { throw 'post-runtime characterization failed' }
+          if ('${{ steps.integrity.outcome }}' -ne 'success') { throw 'post-runtime integrity failed' }
+          if ('${{ steps.negative.outcome }}' -ne 'success') { throw 'negative runtime tests failed' }
+          'FASE_4A=PASS_LIMITATO'
+          'PASS_REALE=NO'
