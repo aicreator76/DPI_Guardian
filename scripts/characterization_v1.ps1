@@ -54,7 +54,7 @@ $unlinkedPdfFields = [System.Collections.Generic.List[string]]::new()
 foreach ($row in $rows) {
     $actualFields = @($row.PSObject.Properties.Name | Sort-Object)
     Require ((Compare-Object $expectedFields $actualFields).Count -eq 0) "$($row.id): field set differs"
-    Require ($row.file_collegati_count -is [int]) "$($row.id): file_collegati_count is not integer"
+    Require (($row.file_collegati_count -is [int]) -or ($row.file_collegati_count -is [long])) "$($row.id): file_collegati_count is not integer"
     Require ($row.file_collegati -is [System.Array]) "$($row.id): file_collegati is not array"
     Require ($row.allegati -is [System.Array]) "$($row.id): allegati is not array"
     Require ($row.file_collegati_count -eq @($row.file_collegati).Count) "$($row.id): file_collegati_count mismatch"
