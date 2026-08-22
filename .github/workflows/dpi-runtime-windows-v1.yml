@@ -1,0 +1,83 @@
+name: DPI Runtime Windows V1
+
+on:
+  push:
+    branches:
+      - test/dpi-runtime-windows-v1
+  pull_request:
+    paths:
+      - 'demo/**'
+      - 'scripts/**'
+      - '.github/workflows/dpi-runtime-windows-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-runtime:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Snapshot before runtime
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $json='demo/03_PRESENTAZIONE/console/dashboard_data.json'
+          $out='demo/02_OUTPUT'
+          if (!(Test-Path $json)) { throw 'dashboard_data.json missing before runtime' }
+          $d=Get-Content $json -Raw | ConvertFrom-Json
+          "PRE_JSON_SHA256=$((Get-FileHash $json -Algorithm SHA256).Hash)"
+          "PRE_JSON_RECORDS=$(@($d.rows).Count)"
+          "PRE_FINAL_STATUS=$($d.final_status)"
+          "PRE_OUTPUT_FILES=$((@(Get-ChildItem $out -File -Force).Name -join '|'))"
+          "INDEX_EXISTS=$([bool](Test-Path 'demo/03_PRESENTAZIONE/console/index_regina_fix.html'))"
+          "INDEX_SIZE=$((Get-Item 'demo/03_PRESENTAZIONE/console/index_regina_fix.html').Length)"
+
+      - name: Execute real Windows local runtime
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Continue'
+          & powershell -NoProfile -ExecutionPolicy Bypass -File 'demo/04_SCRIPT/run_local.ps1' *>&1 | Tee-Object -FilePath runtime-output.txt
+          $code=$LASTEXITCODE
+          "WINDOWS_RUNTIME_EXECUTED=YES"
+          "RUNTIME_EXIT_CODE=$code"
+          if ($code -ne 0) { exit $code }
+
+      - name: Snapshot after runtime
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $outJson='demo/02_OUTPUT/dashboard_data.json'
+          $consoleJson='demo/03_PRESENTAZIONE/console/dashboard_data.json'
+          if (!(Test-Path $outJson)) { throw 'runtime did not produce expected 02_OUTPUT/dashboard_data.json' }
+          if (!(Test-Path $consoleJson)) { throw 'runtime did not leave console dashboard_data.json' }
+          $d=Get-Content $consoleJson -Raw | ConvertFrom-Json
+          "POST_OUTPUT_SHA256=$((Get-FileHash $outJson -Algorithm SHA256).Hash)"
+          "POST_CONSOLE_SHA256=$((Get-FileHash $consoleJson -Algorithm SHA256).Hash)"
+          "POST_JSON_RECORDS=$(@($d.rows).Count)"
+          "POST_FINAL_STATUS=$($d.final_status)"
+          "POST_OUTPUT_FILES=$((@(Get-ChildItem 'demo/02_OUTPUT' -File -Force).Name -join '|'))"
+          if (@($d.rows).Count -ne 5) { throw 'runtime JSON does not contain 5 records' }
+
+      - name: Dashboard automatic checks
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $html='demo/03_PRESENTAZIONE/console/index_regina_fix.html'
+          if (!(Test-Path $html) -or (Get-Item $html).Length -le 0) { throw 'dashboard HTML missing or empty' }
+          $text=Get-Content $html -Raw
+          if ($text -notmatch 'dashboard_data\.json') { throw 'dashboard does not reference dashboard_data.json' }
+          Get-Content 'demo/03_PRESENTAZIONE/console/dashboard_data.json' -Raw | ConvertFrom-Json | Out-Null
+          'DASHBOARD_JSON_REFERENCE_RESOLVES=YES'
+          'VISUAL_RUNTIME=NON_VERIFICATO'
+
+      - name: Post-runtime characterization
+        shell: pwsh
+        run: ./scripts/characterization_v1.ps1
+
+      - name: Post-runtime integrity
+        shell: pwsh
+        run: ./scripts/integrity_v1.ps1
