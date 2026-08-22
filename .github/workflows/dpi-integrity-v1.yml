@@ -1,0 +1,26 @@
+name: DPI Integrity V1
+
+on:
+  push:
+    branches:
+      - fix/dpi-integrity-v1
+  pull_request:
+    paths:
+      - 'scripts/integrity_v1.ps1'
+      - 'demo/03_PRESENTAZIONE/console/dashboard_data.json'
+      - 'demo/03_PRESENTAZIONE/console/pdf/**'
+      - '.github/workflows/dpi-integrity-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run DPI integrity gate
+        shell: pwsh
+        run: ./scripts/integrity_v1.ps1
