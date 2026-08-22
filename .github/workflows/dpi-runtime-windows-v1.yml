@@ -20,7 +20,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Snapshot before runtime
         shell: powershell
         run: |
@@ -35,7 +34,6 @@ jobs:
           "PRE_OUTPUT_FILES=$((@(Get-ChildItem $out -File -Force).Name -join '|'))"
           "INDEX_EXISTS=$([bool](Test-Path 'demo/03_PRESENTAZIONE/console/index_regina_fix.html'))"
           "INDEX_SIZE=$((Get-Item 'demo/03_PRESENTAZIONE/console/index_regina_fix.html').Length)"
-
       - name: Execute real Windows local runtime
         shell: powershell
         run: |
@@ -45,7 +43,6 @@ jobs:
           "WINDOWS_RUNTIME_EXECUTED=YES"
           "RUNTIME_EXIT_CODE=$code"
           if ($code -ne 0) { exit $code }
-
       - name: Snapshot after runtime
         shell: powershell
         run: |
@@ -61,7 +58,6 @@ jobs:
           "POST_FINAL_STATUS=$($d.final_status)"
           "POST_OUTPUT_FILES=$((@(Get-ChildItem 'demo/02_OUTPUT' -File -Force).Name -join '|'))"
           if (@($d.rows).Count -ne 5) { throw 'runtime JSON does not contain 5 records' }
-
       - name: Dashboard automatic checks
         shell: powershell
         run: |
@@ -73,11 +69,12 @@ jobs:
           Get-Content 'demo/03_PRESENTAZIONE/console/dashboard_data.json' -Raw | ConvertFrom-Json | Out-Null
           'DASHBOARD_JSON_REFERENCE_RESOLVES=YES'
           'VISUAL_RUNTIME=NON_VERIFICATO'
-
       - name: Post-runtime characterization
         shell: pwsh
         run: ./scripts/characterization_v1.ps1
-
       - name: Post-runtime integrity
         shell: pwsh
         run: ./scripts/integrity_v1.ps1
+      - name: Isolated negative fixtures
+        shell: pwsh
+        run: ./scripts/runtime_negative_v1.ps1
