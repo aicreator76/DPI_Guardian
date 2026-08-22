@@ -51,3 +51,4 @@ Invoke-NegativeFixture 'EMPTY_REFERENCED_PDF' {
     [void](Set-ReferencedPdfFixture -Root $r -Empty $true)
 }
 Write-Host 'NEGATIVE_FIXTURES=PASS'
+exit 0
