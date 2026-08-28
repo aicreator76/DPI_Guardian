@@ -1,3 +1,5 @@
+$ErrorActionPreference = "Stop"
+
 # Root demo = cartella "demo" (portabile su qualunque PC)
 $root = Split-Path -Parent $PSScriptRoot
 
@@ -17,19 +19,70 @@ Write-Host ""
 Write-Host "=== CONTROLLO FILE DATI ==="
 Write-Host ""
 
-if (Test-Path $datiDir) {
-    $files = Get-ChildItem $datiDir -File
+$files = @()
+$inputFailure = $null
+
+if (Test-Path -LiteralPath $datiDir -PathType Container) {
+    try {
+        $files = @(Get-ChildItem -LiteralPath $datiDir -File -Recurse -ErrorAction Stop)
+    }
+    catch {
+        $inputFailure = "INPUT_DISCOVERY_FAILED: $($_.Exception.Message)"
+    }
+
     $count = $files.Count
 
     Write-Host "Numero file trovati:" $count
     Write-Host ""
 
     foreach ($f in $files) {
-        Write-Host "FILE ->" $f.Name
+        Write-Host "FILE ->" $f.FullName
+    }
+
+    if (-not $inputFailure -and $count -eq 0) {
+        $inputFailure = "NO_INPUT_FILES_DISCOVERED"
     }
 }
 else {
+    $inputFailure = "INPUT_DIRECTORY_NOT_FOUND: $datiDir"
     Write-Host "Cartella dati non trovata:" $datiDir
+}
+
+if ($inputFailure) {
+    $reportFile = Join-Path $outputDir "DPI_GUARDIAN_DEMO_REPORT.txt"
+    $jsonPath = Join-Path $outputDir "dashboard_data.json"
+
+    @"
+DPI GUARDIAN DEMO REPORT
+DATA: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+
+ROOT: $root
+DATI: $datiDir
+OUTPUT: $outputDir
+
+ESITO:
+- Esecuzione interrotta in modalità fail-closed
+- Motivo: $inputFailure
+
+==========================================
+ESITO DEMO: FAIL
+Dashboard collegata: NON_AUTORIZZATA
+Report generato: SI
+Stato demo: NON_PRESENTABILE
+==========================================
+"@ | Set-Content -LiteralPath $reportFile -Encoding UTF8
+
+    [pscustomobject]@{
+        generated_at  = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+        final_status  = "FAIL"
+        warning_count = 0
+        error_count   = 1
+        summary       = $inputFailure
+        rows          = @()
+    } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $jsonPath -Encoding UTF8
+
+    Write-Error $inputFailure -ErrorAction Continue
+    exit 2
 }
 
 Write-Host ""
@@ -104,8 +157,7 @@ try {
 
     $dashboardRows = @()
 
-    if ($files) {
-        foreach ($file in $files) {
+    foreach ($file in $files) {
             $dashboardRows += [pscustomobject]@{
                 dpi_id             = $null
                 operatore          = $null
@@ -119,6 +171,9 @@ try {
                 stato_generale     = if (Test-Path $operatoriDir) { "OK" } else { "ATTENZIONE" }
             }
         }
+
+    if ($dashboardRows.Count -eq 0) {
+        throw "NO_FILES_PROCESSED"
     }
 
     $jsonFinalStatus = if (Test-Path $operatoriDir) { "OK" } else { "ATTENZIONE" }
@@ -145,8 +200,8 @@ try {
     Write-Host "[OK] Dashboard JSON creato: $jsonPath"
 }
 catch {
-    Write-Host ""
-    Write-Host "[WARNING] Export dashboard JSON fallito: $($_.Exception.Message)"
+    Write-Error "DASHBOARD_JSON_EXPORT_FAILED: $($_.Exception.Message)" -ErrorAction Continue
+    exit 3
 }
 # =========================
 # END DASHBOARD JSON EXPORT
