@@ -1,0 +1,33 @@
+name: DPI Guardian 4D positive chain minimum
+
+on:
+  push:
+    branches:
+      - feature/dpi-4d-positive-chain-minimum
+    paths:
+      - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
+      - tests/dpi-4d-positive-chain.ps1
+      - tests/dpi-4c-realinput-failclosed.ps1
+      - .github/workflows/dpi-4d-positive-chain.yml
+  pull_request:
+    paths:
+      - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
+      - tests/dpi-4d-positive-chain.ps1
+      - tests/dpi-4c-realinput-failclosed.ps1
+      - .github/workflows/dpi-4d-positive-chain.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  positive-chain-and-regression:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run DPI 4D positive-chain, adversarial, and 4C regression gates
+        shell: pwsh
+        run: ./tests/dpi-4d-positive-chain.ps1
