@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $SourceScript = Join-Path $RepoRoot "demo\04_SCRIPT\DPI_GUARDIAN_RUN.ps1"
-$ParentCommit = "e2faacdfc1d61b07942e941d075d6c3bb5ab4c99"
+$SemanticParentCommit = "2ff81477e938a9853047f2a619661855c80322f1"
 $Shell = (Get-Command pwsh -ErrorAction SilentlyContinue).Source
 if (-not $Shell) {
     $Shell = (Get-Command powershell -ErrorAction Stop).Source
@@ -16,7 +16,7 @@ function Assert-True {
 
 function New-Fixture {
     param([string]$Name)
-    $root = Join-Path ([System.IO.Path]::GetTempPath()) ("dpi4c_" + $Name + "_" + [guid]::NewGuid().ToString("N"))
+    $root = Join-Path ([System.IO.Path]::GetTempPath()) ("dpi4c_semantic_" + $Name + "_" + [guid]::NewGuid().ToString("N"))
     $demo = Join-Path $root "demo"
     $scriptDir = Join-Path $demo "04_SCRIPT"
     New-Item -ItemType Directory -Force -Path $scriptDir | Out-Null
@@ -41,40 +41,67 @@ function Invoke-Fixture {
     }
 }
 
-$ParentSource = git -C $RepoRoot show "$($ParentCommit):demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1"
+$ParentSource = git -C $RepoRoot show "$($SemanticParentCommit):demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1"
 $ParentText = $ParentSource -join [Environment]::NewLine
-Assert-True ($ParentText -match 'Get-ChildItem \$datiDir -File(\r?\n|$)') "D00_PARENT_NON_RECURSIVE_REPRODUCED"
-Assert-True ($ParentText -match 'PRESENTABILE CON WARNING') "D01_PARENT_FALSE_STATUS_REPRODUCED"
+Assert-True ($ParentText -match 'PRESENTABILE CON WARNING') "S00_PARENT_PRESENTABILITY_OVERCLAIM_REPRODUCED"
+Assert-True ($ParentText -match 'dpi_id\s+= \$null') "S01_PARENT_NULL_SEMANTIC_FIELDS_REPRODUCED"
+Assert-True ($ParentText -notmatch 'SEMANTIC_PRESENTABILITY_BLOCKED') "S02_PARENT_HAS_NO_SEMANTIC_FAIL_CLOSED"
+
+$SourceText = Get-Content -LiteralPath $SourceScript -Raw
+Assert-True ($SourceText -notmatch 'PRESENTABILE CON WARNING') "S03_FALSE_PRESENTABILITY_LABEL_RETIRED"
+Assert-True ($SourceText -match 'SEMANTIC_PRESENTABILITY_BLOCKED') "S04_SEMANTIC_FAIL_CLOSED_PRESENT"
 
 $SourceHashBefore = (Get-FileHash -LiteralPath $SourceScript -Algorithm SHA256).Hash
 
-$nested = New-Fixture "nested"
+$nested = New-Fixture "nested_unverified"
 try {
     $nestedInput = Join-Path $nested "01_DEMO_DATI\cliente\lotto"
     New-Item -ItemType Directory -Force -Path $nestedInput | Out-Null
-    Set-Content -LiteralPath (Join-Path $nestedInput "input_nested.csv") -Value @("id,value","1,test") -Encoding UTF8
+    Set-Content -LiteralPath (Join-Path $nestedInput "input_nested.csv") -Value @("id,value", "1,test") -Encoding UTF8
+
     $r = Invoke-Fixture $nested
     $j = Get-Content -LiteralPath $r.JsonPath -Raw | ConvertFrom-Json
-    Assert-True ($r.ExitCode -eq 0) "D02_NESTED_INPUT_EXIT_ZERO"
-    Assert-True ($r.Stdout -match 'Numero file trovati:\s+1') "D03_NESTED_INPUT_DISCOVERED"
-    Assert-True (@($j.rows).Count -eq 1) "D04_NESTED_INPUT_PROCESSED"
+    $report = Get-Content -LiteralPath $r.ReportPath -Raw
+    $row = @($j.rows)[0]
+
+    Assert-True ($r.ExitCode -eq 4) "S05_UNVERIFIED_NESTED_INPUT_NONZERO_EXIT"
+    Assert-True ($r.Stdout -match 'Numero file trovati:\s+1') "S06_RECURSIVE_DISCOVERY_RETAINED"
+    Assert-True (@($j.rows).Count -eq 1) "S07_DISCOVERED_ROW_RETAINED_AS_EVIDENCE"
+    Assert-True ($j.final_status -eq "NON_VERIFICATO" -and $j.error_count -ge 1) "S08_UNVERIFIED_JSON_FAIL_CLOSED"
+    Assert-True ($j.summary -match 'OPERATOR_DIRECTORY_NOT_FOUND') "S09_MISSING_OPERATOR_DIRECTORY_BLOCKS"
+    Assert-True ($j.summary -match 'SEMANTIC_CORE_NOT_VERIFIED:1/1') "S10_NULL_SEMANTIC_CORE_BLOCKS"
+    Assert-True ($report -match 'Stato demo: NON_PRESENTABILE') "S11_UNVERIFIED_REPORT_NON_PRESENTABLE"
+    Assert-True ($report -notmatch 'Demo eseguita correttamente') "S12_UNVERIFIED_REPORT_NO_FALSE_SUCCESS"
+    Assert-True (
+        $null -eq $row.dpi_id -and
+        $null -eq $row.operatore -and
+        $null -eq $row.norma -and
+        $null -eq $row.matricola -and
+        $null -eq $row.manuale_ok -and
+        $null -eq $row.revisione_ok -and
+        $null -eq $row.prossima_revisione
+    ) "S13_NULL_CORE_FIELDS_EXPLICITLY_DETECTED"
 }
 finally {
     Remove-Item -LiteralPath (Split-Path -Parent $nested) -Recurse -Force
 }
 
-$top = New-Fixture "top"
+$operatorDirectoryPresent = New-Fixture "operator_dir_present"
 try {
-    $topInput = Join-Path $top "01_DEMO_DATI"
-    New-Item -ItemType Directory -Force -Path $topInput | Out-Null
-    Set-Content -LiteralPath (Join-Path $topInput "input_top.csv") -Value @("id,value","1,test") -Encoding UTF8
-    $r = Invoke-Fixture $top
+    $input = Join-Path $operatorDirectoryPresent "01_DEMO_DATI\cliente"
+    $operators = Join-Path $operatorDirectoryPresent "01_DEMO_DATI\08_OPERATORI_DPI"
+    New-Item -ItemType Directory -Force -Path $input, $operators | Out-Null
+    Set-Content -LiteralPath (Join-Path $input "input.csv") -Value @("id,value", "1,test") -Encoding UTF8
+
+    $r = Invoke-Fixture $operatorDirectoryPresent
     $j = Get-Content -LiteralPath $r.JsonPath -Raw | ConvertFrom-Json
-    Assert-True ($r.ExitCode -eq 0) "D05_TOP_LEVEL_REGRESSION_EXIT_ZERO"
-    Assert-True (@($j.rows).Count -eq 1) "D06_TOP_LEVEL_REGRESSION_PROCESSED"
+
+    Assert-True ($r.ExitCode -eq 4) "S14_OPERATOR_DIRECTORY_ALONE_CANNOT_AUTHORIZE_PRESENTABILITY"
+    Assert-True ($j.summary -notmatch 'OPERATOR_DIRECTORY_NOT_FOUND') "S15_OPERATOR_DIRECTORY_PRESENCE_RECOGNIZED"
+    Assert-True ($j.summary -match 'SEMANTIC_CORE_NOT_VERIFIED:1/1') "S16_NULL_FIELDS_REMAIN_BLOCKING_WITH_OPERATOR_DIRECTORY"
 }
 finally {
-    Remove-Item -LiteralPath (Split-Path -Parent $top) -Recurse -Force
+    Remove-Item -LiteralPath (Split-Path -Parent $operatorDirectoryPresent) -Recurse -Force
 }
 
 $empty = New-Fixture "empty"
@@ -83,10 +110,9 @@ try {
     $r = Invoke-Fixture $empty
     $j = Get-Content -LiteralPath $r.JsonPath -Raw | ConvertFrom-Json
     $report = Get-Content -LiteralPath $r.ReportPath -Raw
-    Assert-True ($r.ExitCode -eq 2) "D07_EMPTY_INPUT_NONZERO_EXIT"
-    Assert-True ($j.final_status -eq "FAIL" -and $j.error_count -eq 1) "D08_EMPTY_INPUT_FAIL_JSON"
-    Assert-True ($report -match 'Stato demo: NON_PRESENTABILE') "D09_EMPTY_INPUT_NON_PRESENTABLE"
-    Assert-True ($report -notmatch 'Demo eseguita correttamente') "D10_EMPTY_INPUT_NO_FALSE_GREEN"
+
+    Assert-True ($r.ExitCode -eq 2) "S17_ZERO_INPUT_REMAINS_FAIL_CLOSED"
+    Assert-True ($j.final_status -eq "FAIL" -and $report -match 'Stato demo: NON_PRESENTABILE') "S18_ZERO_INPUT_CONTRACT_RETAINED"
 }
 finally {
     Remove-Item -LiteralPath (Split-Path -Parent $empty) -Recurse -Force
@@ -96,14 +122,15 @@ $missing = New-Fixture "missing"
 try {
     $r = Invoke-Fixture $missing
     $j = Get-Content -LiteralPath $r.JsonPath -Raw | ConvertFrom-Json
-    Assert-True ($r.ExitCode -eq 2) "D11_MISSING_INPUT_NONZERO_EXIT"
-    Assert-True ($j.summary -match '^INPUT_DIRECTORY_NOT_FOUND:') "D12_MISSING_INPUT_FAIL_REASON"
+
+    Assert-True ($r.ExitCode -eq 2) "S19_MISSING_INPUT_REMAINS_FAIL_CLOSED"
+    Assert-True ($j.summary -match '^INPUT_DIRECTORY_NOT_FOUND:') "S20_MISSING_INPUT_REASON_RETAINED"
 }
 finally {
     Remove-Item -LiteralPath (Split-Path -Parent $missing) -Recurse -Force
 }
 
 $SourceHashAfter = (Get-FileHash -LiteralPath $SourceScript -Algorithm SHA256).Hash
-Assert-True ($SourceHashBefore -eq $SourceHashAfter) "D13_SOURCE_UNCHANGED_BY_TESTS"
+Assert-True ($SourceHashBefore -eq $SourceHashAfter) "S21_SOURCE_UNCHANGED_BY_TESTS"
 
-Write-Host "DPI_4C_MINIMAL_FIX_TESTS=14/14_PASS"
+Write-Host "DPI_4C_SEMANTIC_FAIL_CLOSED_TESTS=22/22_PASS"

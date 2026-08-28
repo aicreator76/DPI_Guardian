@@ -108,46 +108,6 @@ else {
 }
 
 $reportFile = Join-Path $outputDir "DPI_GUARDIAN_DEMO_REPORT.txt"
-
-@"
-DPI GUARDIAN DEMO REPORT
-DATA: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-
-ROOT: $root
-DATI: $datiDir
-OUTPUT: $outputDir
-
-ESITO:
-- Demo eseguita correttamente
-- Controllo file dati completato
-- Controllo operatori completato o saltato con warning
-"@ | Set-Content -Path $reportFile -Encoding UTF8
-
-Write-Host ""
-Write-Host "REPORT CREATO:"
-Write-Host $reportFile
-Write-Host ""
-
-Write-Host "=== FINE CONTROLLO ==="
-Write-Host ""
-if (Test-Path $reportFile) {
-    $finalEsito = "OK"
-    $finalStatoDemo = "PRESENTABILE"
-    $dashboardCheck = "VERIFICARE AVVIO START_DEMO.bat"
-
-    if (-not (Test-Path $operatoriDir)) {
-        $finalEsito = "ATTENZIONE"
-        $finalStatoDemo = "PRESENTABILE CON WARNING"
-    }
-
-    Add-Content -Path $reportFile -Value ""
-    Add-Content -Path $reportFile -Value "=========================================="
-    Add-Content -Path $reportFile -Value "ESITO DEMO: $finalEsito"
-    Add-Content -Path $reportFile -Value "Dashboard collegata: $dashboardCheck"
-    Add-Content -Path $reportFile -Value "Report generato: SI"
-    Add-Content -Path $reportFile -Value "Stato demo: $finalStatoDemo"
-    Add-Content -Path $reportFile -Value "=========================================="
-}
 # =========================
 # DASHBOARD JSON EXPORT (aligned to current old script)
 # Output: ..\02_OUTPUT\dashboard_data.json
@@ -176,28 +136,101 @@ try {
         throw "NO_FILES_PROCESSED"
     }
 
-    $jsonFinalStatus = if (Test-Path $operatoriDir) { "OK" } else { "ATTENZIONE" }
-    $jsonWarningCount = if (Test-Path $operatoriDir) { 0 } else { 1 }
-    $jsonErrorCount = 0
-    $jsonSummary = if (Test-Path $operatoriDir) {
-        "Demo eseguita correttamente con struttura dati presente."
-    } else {
-        "Demo eseguita correttamente, ma cartella operatori assente: controllo completato con warning."
+    $semanticBlockers = @()
+
+    if (-not (Test-Path -LiteralPath $operatoriDir -PathType Container)) {
+        $semanticBlockers += "OPERATOR_DIRECTORY_NOT_FOUND"
+    }
+
+    $semanticUnverifiedRows = @(
+        $dashboardRows | Where-Object {
+            [string]::IsNullOrWhiteSpace([string]$_.dpi_id) -or
+            [string]::IsNullOrWhiteSpace([string]$_.operatore) -or
+            [string]::IsNullOrWhiteSpace([string]$_.norma) -or
+            [string]::IsNullOrWhiteSpace([string]$_.matricola) -or
+            $null -eq $_.manuale_ok -or
+            $null -eq $_.revisione_ok -or
+            [string]::IsNullOrWhiteSpace([string]$_.prossima_revisione)
+        }
+    )
+
+    if ($semanticUnverifiedRows.Count -gt 0) {
+        $semanticBlockers += "SEMANTIC_CORE_NOT_VERIFIED:$($semanticUnverifiedRows.Count)/$($dashboardRows.Count)"
+    }
+
+    if ($semanticBlockers.Count -gt 0) {
+        $semanticFailure = "SEMANTIC_PRESENTABILITY_BLOCKED: " + ($semanticBlockers -join "; ")
+
+        [pscustomobject]@{
+            generated_at  = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+            final_status  = "NON_VERIFICATO"
+            warning_count = 0
+            error_count   = $semanticBlockers.Count
+            summary       = $semanticFailure
+            rows          = $dashboardRows
+        } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $jsonPath -Encoding UTF8
+
+        @"
+DPI GUARDIAN DEMO REPORT
+DATA: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+
+ROOT: $root
+DATI: $datiDir
+OUTPUT: $outputDir
+
+ESITO:
+- File scoperti: $($files.Count)
+- Righe dashboard materializzate: $($dashboardRows.Count)
+- Presentabilità semantica bloccata in modalità fail-closed
+- Motivo: $semanticFailure
+
+==========================================
+ESITO DEMO: NON_VERIFICATO
+Dashboard collegata: NON_AUTORIZZATA
+Report generato: SI
+Stato demo: NON_PRESENTABILE
+==========================================
+"@ | Set-Content -LiteralPath $reportFile -Encoding UTF8
+
+        Write-Error $semanticFailure -ErrorAction Continue
+        exit 4
     }
 
     $dashboardObject = [pscustomobject]@{
         generated_at  = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
-        final_status  = $jsonFinalStatus
-        warning_count = $jsonWarningCount
-        error_count   = $jsonErrorCount
-        summary       = $jsonSummary
+        final_status  = "OK"
+        warning_count = 0
+        error_count   = 0
+        summary       = "Demo semanticamente verificata."
         rows          = $dashboardRows
     }
 
-    $dashboardObject | ConvertTo-Json -Depth 6 | Set-Content -Path $jsonPath -Encoding UTF8
+    $dashboardObject | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $jsonPath -Encoding UTF8
+
+    @"
+DPI GUARDIAN DEMO REPORT
+DATA: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+
+ROOT: $root
+DATI: $datiDir
+OUTPUT: $outputDir
+
+ESITO:
+- File scoperti: $($files.Count)
+- Righe dashboard materializzate: $($dashboardRows.Count)
+- Campi semantici core verificati: SI
+
+==========================================
+ESITO DEMO: OK
+Dashboard collegata: VERIFICARE AVVIO START_DEMO.bat
+Report generato: SI
+Stato demo: PRESENTABILE
+==========================================
+"@ | Set-Content -LiteralPath $reportFile -Encoding UTF8
 
     Write-Host ""
     Write-Host "[OK] Dashboard JSON creato: $jsonPath"
+    Write-Host "REPORT CREATO: $reportFile"
 }
 catch {
     Write-Error "DASHBOARD_JSON_EXPORT_FAILED: $($_.Exception.Message)" -ErrorAction Continue
