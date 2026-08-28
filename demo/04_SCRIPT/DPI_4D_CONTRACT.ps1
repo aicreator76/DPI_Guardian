@@ -15,7 +15,7 @@ function Get-P {
     if ($null -eq $Object) { return $null }
     $p = $Object.PSObject.Properties[$Name]
     if ($null -eq $p) { return $null }
-    return $p.Value
+    Write-Output -NoEnumerate $p.Value
 }
 
 function Test-Object {
