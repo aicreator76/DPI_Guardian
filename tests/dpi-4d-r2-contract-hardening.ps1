@@ -70,6 +70,10 @@ function New-ValidCase {
         source_version='v1'
         authority_ref='AUTH_SYN'
         source_registry=@(New-Source)
+        cardinality=[ordered]@{
+            assignment_count=1
+            requirement_count=1
+        }
         worker_ref=New-Node $worker
         job_role_id=New-Node $role
         risk_id=New-Node $risk
@@ -172,10 +176,10 @@ if($Mode -eq 'Full'){
     $c=New-ValidCase; $c['relations']['job_role_risk']['from']='JOB_ROLE_SYN_DIFFERENT'; Check-Decision $c 'A24_RELATION_CONTRADICTION' 'NON_VERIFICATO' 'RELATION_CONTRADICTION'
     $c=New-ValidCase; $c['source_registry']=@((New-Source),(New-Source)); Check-Decision $c 'A25_DUPLICATE_SOURCE' 'NON_VERIFICATO' 'SOURCE_CONFLICT'
     $c=New-ValidCase; $s1=New-Source; $s2=New-Source; $s2['authority_ref']='OTHER'; $c['source_registry']=@($s1,$s2); Check-Decision $c 'A26_CONFLICTING_SOURCE' 'NON_VERIFICATO' 'SOURCE_CONFLICT'
-    $c=New-ValidCase; $c['relations']['job_role_risk']['from']='job_role_syn_001'; Check-Decision $c 'A27_CASE_MISMATCH' 'NON_VERIFICATO' 'RELATION_CONTRADICTION'
+    $c=New-ValidCase; $c['relations']['job_role_risk']['from']='job_role_syn_001'; Check-Decision $c 'A27_CASE_MISMATCH' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
     $c=New-ValidCase; $c['second_assignment']=$c['assigned_ppe']; Check-Decision $c 'A28_HIDDEN_SECOND_ASSIGNMENT' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
     $c=New-ValidCase; $c['second_requirement']=$c['requirement_id']; Check-Decision $c 'A29_HIDDEN_SECOND_REQUIREMENT' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
-    $c=New-ValidCase; Check-Decision $c 'A30_CARDINALITY_SECOND_FILE' 'NON_VERIFICATO' 'CARDINALITY_UNSUPPORTED' $true
+    $c=New-ValidCase; $c['cardinality']['assignment_count']=2; Check-Decision $c 'A30_CARDINALITY_MARKER_GT1' 'NON_VERIFICATO' 'CARDINALITY_UNSUPPORTED'
 
     # CLAUDE blind attacks designed after implementation, not part of the frozen matrix.
     $c=New-ValidCase; $c['worker_ref']['source_ref']='src_syn'; Check-Decision $c 'B01_SOURCE_ID_CASE_MISMATCH' 'NON_VERIFICATO' 'SOURCE_NOT_BOUND'
