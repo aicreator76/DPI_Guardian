@@ -1,0 +1,27 @@
+name: DPI Guardian 4C minimal fix
+
+on:
+  push:
+    branches:
+      - fix/dpi-4c-realinput-failclosed
+  pull_request:
+    paths:
+      - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
+      - tests/dpi-4c-realinput-failclosed.ps1
+      - .github/workflows/dpi-4c-realinput-failclosed.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-regression:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run DPI 4C negative and regression tests
+        shell: pwsh
+        run: ./tests/dpi-4c-realinput-failclosed.ps1
