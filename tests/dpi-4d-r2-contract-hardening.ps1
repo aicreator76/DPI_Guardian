@@ -125,64 +125,64 @@ function Check-Decision {
 
 # Original 4D semantics under hardened contract.
 Check-Decision (New-ValidCase) 'T01_HAPPY_PATH' 'COVERED' 'COVERED_COMPLETE_CHAIN'
-$c=New-ValidCase; $c.assigned_ppe.value='NOT_ASSIGNED'; $c.relations.worker_ppe_assignment.status='NOT_ASSIGNED'
+$c=New-ValidCase; $c['assigned_ppe']['value']='NOT_ASSIGNED'; $c['relations']['worker_ppe_assignment']['status']='NOT_ASSIGNED'
 Check-Decision $c 'T02_TRUE_GAP' 'GAP' 'REQUIRED_PPE_NOT_ASSIGNED'
-$c=New-ValidCase; $c.relations.job_role_risk=$null
+$c=New-ValidCase; $c['relations']['job_role_risk']=$null
 Check-Decision $c 'T03_MAPPING_MISSING' 'NON_VERIFICATO' 'JOB_ROLE_RISK_NOT_PROVEN'
-$c=New-ValidCase; $c.requirement_id=$null
+$c=New-ValidCase; $c['requirement_id']=$null
 Check-Decision $c 'T04_REQUIREMENT_MISSING' 'NON_VERIFICATO' 'RISK_REQUIREMENT_NOT_PROVEN'
-$c=New-ValidCase; $c.evidence_ref=$null
+$c=New-ValidCase; $c['evidence_ref']=$null
 Check-Decision $c 'T05_EVIDENCE_MISSING' 'NON_VERIFICATO' 'EVIDENCE_NOT_PROVEN'
-$c=New-ValidCase; $c.validity.value='EXPIRED'; $c.validity.valid_to='2026-05-31'
+$c=New-ValidCase; $c['validity']['value']='EXPIRED'; $c['validity']['valid_to']='2026-05-31'
 Check-Decision $c 'T06_EXPIRED' 'GAP' 'ASSIGNED_PPE_INVALID_OR_EXPIRED'
-$c=New-ValidCase; $c.department='JOB_ROLE_SYN_001'
+$c=New-ValidCase; $c['department']='JOB_ROLE_SYN_001'
 Check-Decision $c 'T07_UNKNOWN_FIELD' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
-$c=New-ValidCase; $c.ppe_type_id=$null
+$c=New-ValidCase; $c['ppe_type_id']=$null
 Check-Decision $c 'T08_PARTIAL_CHAIN' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-$c=New-ValidCase; $c.source_ref=''
+$c=New-ValidCase; $c['source_ref']=''
 Check-Decision $c 'T09_SOURCE_REF_MISSING' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
 $c=New-ValidCase
 Check-Decision $c 'T09B_SECOND_INPUT_FILE' 'NON_VERIFICATO' 'CARDINALITY_UNSUPPORTED' $true
 
 if($Mode -eq 'Full'){
     # PREDEFINED CLAUDE MATRIX frozen before the fix.
-    $c=New-ValidCase; $c.unknown_top='x'; Check-Decision $c 'A01_UNKNOWN_TOP' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
-    $c=New-ValidCase; $c.worker_ref.unknown_node='x'; Check-Decision $c 'A02_UNKNOWN_NODE' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
-    $c=New-ValidCase; $c.relations.job_role_risk.unknown_relation='x'; Check-Decision $c 'A03_UNKNOWN_RELATION' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
-    $c=New-ValidCase; $c.source_registry[0].unknown_source='x'; Check-Decision $c 'A04_UNKNOWN_SOURCE' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
-    $c=New-ValidCase; $c.worker_ref.value=$true; Check-Decision $c 'A05_BOOL_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.risk_id.value=7; Check-Decision $c 'A06_INTEGER_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.requirement_id.value=@('REQ_SYN_001'); Check-Decision $c 'A07_ARRAY_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.ppe_type_id.value=[ordered]@{id='PPE_SYN_001'}; Check-Decision $c 'A08_OBJECT_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.worker_ref.value=' WORKER_SYN_001'; Check-Decision $c 'A09_LEADING_WS' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.worker_ref.source_ref='SRC_SYN '; Check-Decision $c 'A10_TRAILING_WS' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.risk_id.value=''; Check-Decision $c 'A11_EMPTY_STRING' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.risk_id.value=$null; Check-Decision $c 'A12_NULL_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.worker_ref.source_ref='SRC_ARBITRARY'; Check-Decision $c 'A13_ARBITRARY_SOURCE' 'NON_VERIFICATO' 'SOURCE_NOT_BOUND'
-    $c=New-ValidCase; $c.source_registry=$null; Check-Decision $c 'A14_REGISTRY_MISSING' 'NON_VERIFICATO' 'SOURCE_NOT_BOUND'
-    $c=New-ValidCase; $c.worker_ref.source_version='v2'; Check-Decision $c 'A15_VERSION_MISMATCH' 'NON_VERIFICATO' 'SOURCE_VERSION_CONFLICT'
-    $c=New-ValidCase; $c.worker_ref.authority_ref='OTHER_AUTH'; Check-Decision $c 'A16_AUTHORITY_MISMATCH' 'NON_VERIFICATO' 'SOURCE_AUTHORITY_CONFLICT'
-    $c=New-ValidCase; $c.worker_ref.valid_from='2026-12-31'; $c.worker_ref.valid_to='2026-01-01'; Check-Decision $c 'A17_FROM_AFTER_TO' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
-    $c=New-ValidCase; $c.validity.value='VALID'; $c.validity.valid_to='2026-05-31'; Check-Decision $c 'A18_VALID_DATE_CONTRADICTION' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
-    $c=New-ValidCase; $c.validity.value='EXPIRED'; $c.validity.valid_to='2026-06-30'; Check-Decision $c 'A19_EXPIRED_DATE_CONTRADICTION' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
-    $c=New-ValidCase; $c.assignments=@($c.assigned_ppe); Check-Decision $c 'A20_SECOND_ASSIGNMENT_REP' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
-    $c=New-ValidCase; $c.requirements=@($c.requirement_id); Check-Decision $c 'A21_SECOND_REQUIREMENT_REP' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
-    $c=New-ValidCase; $c.alternative_assignments=@(); Check-Decision $c 'A22_ALT_ASSIGNMENT' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
-    $c=New-ValidCase; $c.alternative_requirements=@(); Check-Decision $c 'A23_ALT_REQUIREMENT' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
-    $c=New-ValidCase; $c.relations.job_role_risk.from='JOB_ROLE_SYN_DIFFERENT'; Check-Decision $c 'A24_RELATION_CONTRADICTION' 'NON_VERIFICATO' 'RELATION_CONTRADICTION'
-    $c=New-ValidCase; $c.source_registry=@((New-Source),(New-Source)); Check-Decision $c 'A25_DUPLICATE_SOURCE' 'NON_VERIFICATO' 'SOURCE_CONFLICT'
-    $c=New-ValidCase; $s1=New-Source; $s2=New-Source; $s2.authority_ref='OTHER'; $c.source_registry=@($s1,$s2); Check-Decision $c 'A26_CONFLICTING_SOURCE' 'NON_VERIFICATO' 'SOURCE_CONFLICT'
-    $c=New-ValidCase; $c.relations.job_role_risk.from='job_role_syn_001'; Check-Decision $c 'A27_CASE_MISMATCH' 'NON_VERIFICATO' 'RELATION_CONTRADICTION'
-    $c=New-ValidCase; $c.second_assignment=$c.assigned_ppe; Check-Decision $c 'A28_HIDDEN_SECOND_ASSIGNMENT' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
-    $c=New-ValidCase; $c.second_requirement=$c.requirement_id; Check-Decision $c 'A29_HIDDEN_SECOND_REQUIREMENT' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
+    $c=New-ValidCase; $c['unknown_top']='x'; Check-Decision $c 'A01_UNKNOWN_TOP' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
+    $c=New-ValidCase; $c['worker_ref']['unknown_node']='x'; Check-Decision $c 'A02_UNKNOWN_NODE' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
+    $c=New-ValidCase; $c['relations']['job_role_risk']['unknown_relation']='x'; Check-Decision $c 'A03_UNKNOWN_RELATION' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
+    $c=New-ValidCase; $c['source_registry'][0]['unknown_source']='x'; Check-Decision $c 'A04_UNKNOWN_SOURCE' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
+    $c=New-ValidCase; $c['worker_ref']['value']=$true; Check-Decision $c 'A05_BOOL_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['risk_id']['value']=7; Check-Decision $c 'A06_INTEGER_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['requirement_id']['value']=@('REQ_SYN_001'); Check-Decision $c 'A07_ARRAY_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['ppe_type_id']['value']=[ordered]@{id='PPE_SYN_001'}; Check-Decision $c 'A08_OBJECT_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['worker_ref']['value']=' WORKER_SYN_001'; Check-Decision $c 'A09_LEADING_WS' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['worker_ref']['source_ref']='SRC_SYN '; Check-Decision $c 'A10_TRAILING_WS' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['risk_id']['value']=''; Check-Decision $c 'A11_EMPTY_STRING' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['risk_id']['value']=$null; Check-Decision $c 'A12_NULL_ID' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['worker_ref']['source_ref']='SRC_ARBITRARY'; Check-Decision $c 'A13_ARBITRARY_SOURCE' 'NON_VERIFICATO' 'SOURCE_NOT_BOUND'
+    $c=New-ValidCase; $c['source_registry']=$null; Check-Decision $c 'A14_REGISTRY_MISSING' 'NON_VERIFICATO' 'SOURCE_NOT_BOUND'
+    $c=New-ValidCase; $c['worker_ref']['source_version']='v2'; Check-Decision $c 'A15_VERSION_MISMATCH' 'NON_VERIFICATO' 'SOURCE_VERSION_CONFLICT'
+    $c=New-ValidCase; $c['worker_ref']['authority_ref']='OTHER_AUTH'; Check-Decision $c 'A16_AUTHORITY_MISMATCH' 'NON_VERIFICATO' 'SOURCE_AUTHORITY_CONFLICT'
+    $c=New-ValidCase; $c['worker_ref']['valid_from']='2026-12-31'; $c['worker_ref']['valid_to']='2026-01-01'; Check-Decision $c 'A17_FROM_AFTER_TO' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
+    $c=New-ValidCase; $c['validity']['value']='VALID'; $c['validity']['valid_to']='2026-05-31'; Check-Decision $c 'A18_VALID_DATE_CONTRADICTION' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
+    $c=New-ValidCase; $c['validity']['value']='EXPIRED'; $c['validity']['valid_to']='2026-06-30'; Check-Decision $c 'A19_EXPIRED_DATE_CONTRADICTION' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
+    $c=New-ValidCase; $c['assignments']=@($c['assigned_ppe']); Check-Decision $c 'A20_SECOND_ASSIGNMENT_REP' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
+    $c=New-ValidCase; $c['requirements']=@($c['requirement_id']); Check-Decision $c 'A21_SECOND_REQUIREMENT_REP' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
+    $c=New-ValidCase; $c['alternative_assignments']=@(); Check-Decision $c 'A22_ALT_ASSIGNMENT' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
+    $c=New-ValidCase; $c['alternative_requirements']=@(); Check-Decision $c 'A23_ALT_REQUIREMENT' 'NON_VERIFICATO' 'SCHEMA_CONFLICTING_REPRESENTATION'
+    $c=New-ValidCase; $c['relations']['job_role_risk']['from']='JOB_ROLE_SYN_DIFFERENT'; Check-Decision $c 'A24_RELATION_CONTRADICTION' 'NON_VERIFICATO' 'RELATION_CONTRADICTION'
+    $c=New-ValidCase; $c['source_registry']=@((New-Source),(New-Source)); Check-Decision $c 'A25_DUPLICATE_SOURCE' 'NON_VERIFICATO' 'SOURCE_CONFLICT'
+    $c=New-ValidCase; $s1=New-Source; $s2=New-Source; $s2['authority_ref']='OTHER'; $c['source_registry']=@($s1,$s2); Check-Decision $c 'A26_CONFLICTING_SOURCE' 'NON_VERIFICATO' 'SOURCE_CONFLICT'
+    $c=New-ValidCase; $c['relations']['job_role_risk']['from']='job_role_syn_001'; Check-Decision $c 'A27_CASE_MISMATCH' 'NON_VERIFICATO' 'RELATION_CONTRADICTION'
+    $c=New-ValidCase; $c['second_assignment']=$c['assigned_ppe']; Check-Decision $c 'A28_HIDDEN_SECOND_ASSIGNMENT' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
+    $c=New-ValidCase; $c['second_requirement']=$c['requirement_id']; Check-Decision $c 'A29_HIDDEN_SECOND_REQUIREMENT' 'NON_VERIFICATO' 'SCHEMA_UNKNOWN_FIELD'
     $c=New-ValidCase; Check-Decision $c 'A30_CARDINALITY_SECOND_FILE' 'NON_VERIFICATO' 'CARDINALITY_UNSUPPORTED' $true
 
     # CLAUDE blind attacks designed after implementation, not part of the frozen matrix.
-    $c=New-ValidCase; $c.worker_ref.source_ref='src_syn'; Check-Decision $c 'B01_SOURCE_ID_CASE_MISMATCH' 'NON_VERIFICATO' 'SOURCE_NOT_BOUND'
-    $c=New-ValidCase; $c.source_registry=@($true); Check-Decision $c 'B02_REGISTRY_ELEMENT_BOOL' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.relations.assignment_evidence.status=$true; Check-Decision $c 'B03_RELATION_STATUS_BOOL' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
-    $c=New-ValidCase; $c.job_role_id.valid_from='2026-02-30'; Check-Decision $c 'B04_IMPOSSIBLE_DATE' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
-    $c=New-ValidCase; $c.source_registry[0].authority_ref=' AUTH_SYN'; Check-Decision $c 'B05_REGISTRY_AUTH_WHITESPACE' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['worker_ref']['source_ref']='src_syn'; Check-Decision $c 'B01_SOURCE_ID_CASE_MISMATCH' 'NON_VERIFICATO' 'SOURCE_NOT_BOUND'
+    $c=New-ValidCase; $c['source_registry']=@($true); Check-Decision $c 'B02_REGISTRY_ELEMENT_BOOL' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['relations']['assignment_evidence']['status']=$true; Check-Decision $c 'B03_RELATION_STATUS_BOOL' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
+    $c=New-ValidCase; $c['job_role_id']['valid_from']='2026-02-30'; Check-Decision $c 'B04_IMPOSSIBLE_DATE' 'NON_VERIFICATO' 'VALIDITY_CONTRADICTION'
+    $c=New-ValidCase; $c['source_registry'][0]['authority_ref']=' AUTH_SYN'; Check-Decision $c 'B05_REGISTRY_AUTH_WHITESPACE' 'NON_VERIFICATO' 'SCHEMA_TYPE_INVALID'
 }
 
 # Historical 4C regression must execute the unchanged test suite against the candidate runner.
