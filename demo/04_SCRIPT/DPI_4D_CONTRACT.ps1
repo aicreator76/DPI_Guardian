@@ -1,13 +1,14 @@
 Set-StrictMode -Version Latest
 
 $script:TopAllowed = @(
-    'case_id','synthetic_fixture','as_of_date','source_ref','source_version','authority_ref','source_registry',
+    'case_id','synthetic_fixture','as_of_date','source_ref','source_version','authority_ref','source_registry','cardinality',
     'worker_ref','job_role_id','risk_id','requirement_id','ppe_type_id','assigned_ppe','evidence_ref','validity','relations'
 )
 $script:NodeAllowed = @('value','source_ref','source_version','valid_from','valid_to','authority_ref')
 $script:RelationsAllowed = @('worker_job_role','job_role_risk','risk_requirement','requirement_ppe','worker_ppe_assignment','assignment_evidence')
 $script:RelationAllowed = @('from','to','status','source_ref','source_version','valid_from','valid_to','authority_ref')
 $script:SourceAllowed = @('source_id','source_version','authority_ref','valid_from','valid_to')
+$script:CardinalityAllowed = @('assignment_count','requirement_count')
 $script:ConflictRepresentations = @('assignments','requirements','alternative_assignments','alternative_requirements')
 
 function Get-P {
@@ -37,6 +38,11 @@ function Test-StrictString {
     if (-not $AllowEmpty -and $Value.Length -eq 0) { return $false }
     if ($Value -cne $Value.Trim()) { return $false }
     return $true
+}
+
+function Test-StrictInteger {
+    param($Value)
+    return ($Value -is [int] -or $Value -is [long])
 }
 
 function Get-Unknown {
@@ -223,6 +229,26 @@ function Invoke-Dpi4DDecision {
         return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' 'AS_OF_DATE deve essere yyyy-MM-dd.' @('as_of_date')
     }
 
+    $rawCardinality = Get-RawP $InputObject 'cardinality'
+    if ($rawCardinality.Exists) {
+        if (-not (Test-Object $rawCardinality.Value)) {
+            return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' 'cardinality deve essere oggetto.' @('cardinality')
+        }
+        $unknownCardinality = @(Get-Unknown $rawCardinality.Value $script:CardinalityAllowed)
+        if ($unknownCardinality.Count -gt 0) {
+            return Fail-Decision $InputObject 'SCHEMA_UNKNOWN_FIELD' ('Campo cardinality ignoto: '+($unknownCardinality -join ',')) @('cardinality')
+        }
+        foreach ($field in $script:CardinalityAllowed) {
+            $rawCount = Get-RawP $rawCardinality.Value $field
+            if (-not $rawCount.Exists -or -not (Test-StrictInteger $rawCount.Value)) {
+                return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' ('Cardinalita non intera strict: '+$field) @('cardinality')
+            }
+            if ($rawCount.Value -ne 1) {
+                return Fail-Decision $InputObject 'CARDINALITY_UNSUPPORTED' ('4D Minimum richiede cardinalita 1: '+$field) @('cardinality')
+            }
+        }
+    }
+
     $registryResult = Build-Registry $InputObject $asOf
     if (-not $registryResult.Ok) {
         return Fail-Decision $InputObject $registryResult.Reason $registryResult.Text @('source_registry')
@@ -334,7 +360,17 @@ function Invoke-Dpi4DDecision {
     }
     foreach ($name in $script:RelationsAllowed) {
         $rel = $relMap[$name]
-        if ((Get-P $rel 'from') -cne $expected[$name][0] -or (Get-P $rel 'to') -cne $expected[$name][1]) {
+        $actualFrom = Get-P $rel 'from'
+        $actualTo = Get-P $rel 'to'
+        $expectedFrom = $expected[$name][0]
+        $expectedTo = $expected[$name][1]
+        if ($actualFrom -cne $expectedFrom -or $actualTo -cne $expectedTo) {
+            $caseOnlyMismatch =
+                (($actualFrom -cne $expectedFrom) -and [string]::Equals($actualFrom,$expectedFrom,[StringComparison]::OrdinalIgnoreCase)) -or
+                (($actualTo -cne $expectedTo) -and [string]::Equals($actualTo,$expectedTo,[StringComparison]::OrdinalIgnoreCase))
+            if ($caseOnlyMismatch) {
+                return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' ('Case mismatch relazione: '+$name) @($name)
+            }
             return Fail-Decision $InputObject 'RELATION_CONTRADICTION' ('Endpoint relazione contraddittorio: '+$name) @($name)
         }
     }
