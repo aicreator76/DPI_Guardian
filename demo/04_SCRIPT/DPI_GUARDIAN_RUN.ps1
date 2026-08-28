@@ -1,8 +1,5 @@
 $ErrorActionPreference = "Stop"
 
-# 4D R2 has exactly one semantic validator/decision engine.
-. (Join-Path $PSScriptRoot "DPI_4D_CONTRACT.ps1")
-
 # Root demo = cartella "demo" (portabile su qualunque PC)
 $root = Split-Path -Parent $PSScriptRoot
 
@@ -15,6 +12,9 @@ New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
 # 4D is opt-in and exact: the historical 4C path remains unchanged unless this exact file exists.
 $positiveChainPath = Join-Path $datiDir "DPI_4D_CHAIN.json"
 if (Test-Path -LiteralPath $positiveChainPath -PathType Leaf) {
+    # 4D R2 has exactly one semantic validator/decision engine, loaded only for the positive path.
+    . (Join-Path $PSScriptRoot "DPI_4D_CONTRACT.ps1")
+
     $decisionPath = Join-Path $outputDir "DPI_4D_DECISION.json"
     $reportFile = Join-Path $outputDir "DPI_GUARDIAN_DEMO_REPORT.txt"
 
