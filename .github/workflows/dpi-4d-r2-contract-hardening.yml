@@ -37,3 +37,5 @@ jobs:
       - name: Run R2 strict contract, predefined attacks, blind attacks, and regressions
         shell: pwsh
         run: ./tests/dpi-4d-r2-contract-hardening.ps1 -Mode Full
+
+# R2 gate rerun marker after fixing only fixture-mutation mechanics; assertions unchanged.
