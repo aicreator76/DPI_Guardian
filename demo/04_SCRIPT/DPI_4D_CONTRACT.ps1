@@ -388,7 +388,7 @@ function Invoke-Dpi4DDecision {
         return Fail-Decision $InputObject 'EVIDENCE_NOT_PROVEN' 'assignment_evidence.status deve essere PRESENT.' @('assignment_evidence')
     }
 
-    foreach ($name in @('worker_ref','job_role_id','risk_id','requirement_id','ppe_type_id','assigned_ppe','evidence_ref','validity')) {
+    foreach ($name in @('worker_ref','job_role_id','risk_id','requirement_id','ppe_type_id','assigned_ppe','evidence_ref')) {
         if (-not (Test-ActiveAt $nodes[$name] $asOf)) {
             return Fail-Decision $InputObject 'VALIDITY_CONTRADICTION' ('Nodo non coerente ad AS_OF_DATE: '+$name) @($name)
         }
@@ -401,6 +401,9 @@ function Invoke-Dpi4DDecision {
 
     if (-not ($validity -ceq 'VALID' -or $validity -ceq 'INVALID' -or $validity -ceq 'EXPIRED')) {
         return Fail-Decision $InputObject 'VALIDITY_NOT_PROVEN' 'validity.value non ammesso.' @('validity')
+    }
+    if ($validity -ceq 'INVALID' -and -not (Test-ActiveAt $nodes['validity'] $asOf)) {
+        return Fail-Decision $InputObject 'VALIDITY_CONTRADICTION' 'INVALID non attivo ad AS_OF_DATE.' @('validity')
     }
     $validFrom = Parse-Date ((Get-RawP $nodes['validity'] 'valid_from').Value)
     $validTo = Parse-Date ((Get-RawP $nodes['validity'] 'valid_to').Value) $true
