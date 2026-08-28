@@ -1,232 +1,7 @@
 $ErrorActionPreference = "Stop"
 
-function Get-Dpi4DProperty {
-    param($Object, [string]$Name)
-    if ($null -eq $Object) { return $null }
-    $property = $Object.PSObject.Properties[$Name]
-    if ($null -eq $property) { return $null }
-    return $property.Value
-}
-
-function Test-Dpi4DText {
-    param($Value)
-    return -not [string]::IsNullOrWhiteSpace([string]$Value)
-}
-
-function Get-Dpi4DNodeValue {
-    param($InputObject, [string]$Name)
-    $node = Get-Dpi4DProperty $InputObject $Name
-    return Get-Dpi4DProperty $node "value"
-}
-
-function Test-Dpi4DProvenance {
-    param($Object, [bool]$AuthorityRequired = $false)
-    if ($null -eq $Object) { return $false }
-    if (-not (Test-Dpi4DText (Get-Dpi4DProperty $Object "source_ref"))) { return $false }
-    if (-not (Test-Dpi4DText (Get-Dpi4DProperty $Object "source_version"))) { return $false }
-    if ($AuthorityRequired -and -not (Test-Dpi4DText (Get-Dpi4DProperty $Object "authority_ref"))) { return $false }
-    return $true
-}
-
-function Test-Dpi4DRelation {
-    param(
-        $Relation,
-        [string]$ExpectedFrom,
-        [string]$ExpectedTo,
-        [string]$ExpectedStatus = "",
-        [bool]$AuthorityRequired = $true
-    )
-
-    if ($null -eq $Relation) { return $false }
-    if (-not (Test-Dpi4DProvenance $Relation $AuthorityRequired)) { return $false }
-
-    $actualFrom = [string](Get-Dpi4DProperty $Relation "from")
-    $actualTo = [string](Get-Dpi4DProperty $Relation "to")
-    if (-not ($actualFrom -ceq $ExpectedFrom)) { return $false }
-    if (-not ($actualTo -ceq $ExpectedTo)) { return $false }
-
-    if (Test-Dpi4DText $ExpectedStatus) {
-        $actualStatus = [string](Get-Dpi4DProperty $Relation "status")
-        if (-not ($actualStatus -ceq $ExpectedStatus)) { return $false }
-    }
-
-    return $true
-}
-
-function Get-Dpi4DSourceRefs {
-    param($InputObject)
-
-    $refs = @()
-    $topSource = Get-Dpi4DProperty $InputObject "source_ref"
-    if (Test-Dpi4DText $topSource) { $refs += [string]$topSource }
-
-    foreach ($name in @("worker_ref", "job_role_id", "risk_id", "requirement_id", "ppe_type_id", "assigned_ppe", "evidence_ref", "validity")) {
-        $node = Get-Dpi4DProperty $InputObject $name
-        $ref = Get-Dpi4DProperty $node "source_ref"
-        if (Test-Dpi4DText $ref) { $refs += [string]$ref }
-    }
-
-    $relations = Get-Dpi4DProperty $InputObject "relations"
-    foreach ($name in @("worker_job_role", "job_role_risk", "risk_requirement", "requirement_ppe", "worker_ppe_assignment", "assignment_evidence")) {
-        $relation = Get-Dpi4DProperty $relations $name
-        $ref = Get-Dpi4DProperty $relation "source_ref"
-        if (Test-Dpi4DText $ref) { $refs += [string]$ref }
-    }
-
-    return @($refs | Sort-Object -Unique)
-}
-
-function Get-Dpi4DProvenanceTrace {
-    param($InputObject)
-
-    $trace = @()
-    foreach ($name in @("worker_ref", "job_role_id", "risk_id", "requirement_id", "ppe_type_id", "assigned_ppe", "evidence_ref", "validity")) {
-        $node = Get-Dpi4DProperty $InputObject $name
-        if ($null -ne $node) {
-            $trace += [pscustomobject]@{
-                LINK = $name
-                VALUE = Get-Dpi4DProperty $node "value"
-                SOURCE_REF = Get-Dpi4DProperty $node "source_ref"
-                SOURCE_VERSION = Get-Dpi4DProperty $node "source_version"
-                VALID_FROM = Get-Dpi4DProperty $node "valid_from"
-                VALID_TO = Get-Dpi4DProperty $node "valid_to"
-                AUTHORITY_REF = Get-Dpi4DProperty $node "authority_ref"
-            }
-        }
-    }
-
-    $relations = Get-Dpi4DProperty $InputObject "relations"
-    foreach ($name in @("worker_job_role", "job_role_risk", "risk_requirement", "requirement_ppe", "worker_ppe_assignment", "assignment_evidence")) {
-        $relation = Get-Dpi4DProperty $relations $name
-        if ($null -ne $relation) {
-            $value = "{0}->{1}" -f (Get-Dpi4DProperty $relation "from"), (Get-Dpi4DProperty $relation "to")
-            $status = Get-Dpi4DProperty $relation "status"
-            if (Test-Dpi4DText $status) { $value = "$value [$status]" }
-            $trace += [pscustomobject]@{
-                LINK = $name
-                VALUE = $value
-                SOURCE_REF = Get-Dpi4DProperty $relation "source_ref"
-                SOURCE_VERSION = Get-Dpi4DProperty $relation "source_version"
-                VALID_FROM = Get-Dpi4DProperty $relation "valid_from"
-                VALID_TO = Get-Dpi4DProperty $relation "valid_to"
-                AUTHORITY_REF = Get-Dpi4DProperty $relation "authority_ref"
-            }
-        }
-    }
-
-    return @($trace)
-}
-
-function New-Dpi4DDecision {
-    param(
-        $InputObject,
-        [string]$Decision,
-        [string]$ReasonCode,
-        [string]$ReasonText,
-        [string[]]$MissingLinks = @(),
-        [string]$Provenance = "PARTIAL"
-    )
-
-    return [pscustomobject]@{
-        ENGINE = "DPI_4D_POSITIVE_CHAIN_MINIMUM"
-        CONTRACT_VERSION = "DPI_4D_V1"
-        CASE_ID = Get-Dpi4DProperty $InputObject "case_id"
-        DECISION = $Decision
-        REASON_CODE = $ReasonCode
-        REASON_TEXT_MINIMAL = $ReasonText
-        MISSING_LINKS = @($MissingLinks)
-        SOURCE_REFS = @(Get-Dpi4DSourceRefs $InputObject)
-        PROVENANCE = $Provenance
-        DOMAIN_INFERENCE = "ZERO"
-        PROVENANCE_TRACE = @(Get-Dpi4DProvenanceTrace $InputObject)
-    }
-}
-
-function Invoke-Dpi4DDecision {
-    param($InputObject)
-
-    if (-not (Test-Dpi4DText (Get-Dpi4DProperty $InputObject "source_ref"))) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "SOURCE_REF_NOT_PROVEN" "Top-level source_ref mancante." @("source_ref") "FAIL"
-    }
-
-    $workerNode = Get-Dpi4DProperty $InputObject "worker_ref"
-    $roleNode = Get-Dpi4DProperty $InputObject "job_role_id"
-    $riskNode = Get-Dpi4DProperty $InputObject "risk_id"
-    $requirementNode = Get-Dpi4DProperty $InputObject "requirement_id"
-    $ppeNode = Get-Dpi4DProperty $InputObject "ppe_type_id"
-    $assignmentNode = Get-Dpi4DProperty $InputObject "assigned_ppe"
-    $evidenceNode = Get-Dpi4DProperty $InputObject "evidence_ref"
-    $validityNode = Get-Dpi4DProperty $InputObject "validity"
-    $relations = Get-Dpi4DProperty $InputObject "relations"
-
-    $worker = [string](Get-Dpi4DProperty $workerNode "value")
-    $role = [string](Get-Dpi4DProperty $roleNode "value")
-    $risk = [string](Get-Dpi4DProperty $riskNode "value")
-    $requirement = [string](Get-Dpi4DProperty $requirementNode "value")
-    $ppeType = [string](Get-Dpi4DProperty $ppeNode "value")
-
-    if (-not (Test-Dpi4DText $worker) -or -not (Test-Dpi4DProvenance $workerNode $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "WORKER_NOT_PROVEN" "Worker non provato con provenienza." @("worker_ref") "FAIL"
-    }
-    if (-not (Test-Dpi4DText $role) -or -not (Test-Dpi4DProvenance $roleNode $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "WORKER_JOB_ROLE_NOT_PROVEN" "Job role non provato; nessuna sostituzione da department." @("job_role_id") "FAIL"
-    }
-    if (-not (Test-Dpi4DRelation (Get-Dpi4DProperty $relations "worker_job_role") $worker $role "" $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "WORKER_JOB_ROLE_NOT_PROVEN" "Relazione worker-job_role non provata esattamente." @("worker_job_role") "PARTIAL"
-    }
-
-    if (-not (Test-Dpi4DText $risk) -or -not (Test-Dpi4DProvenance $riskNode $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "JOB_ROLE_RISK_NOT_PROVEN" "Risk non provato con provenienza." @("risk_id") "PARTIAL"
-    }
-    if (-not (Test-Dpi4DRelation (Get-Dpi4DProperty $relations "job_role_risk") $role $risk "" $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "JOB_ROLE_RISK_NOT_PROVEN" "Relazione job_role-risk non provata esattamente." @("job_role_risk") "PARTIAL"
-    }
-
-    if (-not (Test-Dpi4DText $requirement) -or -not (Test-Dpi4DProvenance $requirementNode $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "RISK_REQUIREMENT_NOT_PROVEN" "Requirement non provato o non autoritativo." @("requirement_id") "PARTIAL"
-    }
-    if (-not (Test-Dpi4DRelation (Get-Dpi4DProperty $relations "risk_requirement") $risk $requirement "" $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "RISK_REQUIREMENT_NOT_PROVEN" "Relazione risk-requirement non provata esattamente." @("risk_requirement") "PARTIAL"
-    }
-
-    if (-not (Test-Dpi4DText $ppeType) -or -not (Test-Dpi4DProvenance $ppeNode $false)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "REQUIREMENT_PPE_NOT_PROVEN" "Tipo DPI richiesto non provato." @("ppe_type_id") "PARTIAL"
-    }
-    if (-not (Test-Dpi4DRelation (Get-Dpi4DProperty $relations "requirement_ppe") $requirement $ppeType "" $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "REQUIREMENT_PPE_NOT_PROVEN" "Relazione requirement-ppe_type non provata esattamente." @("requirement_ppe") "PARTIAL"
-    }
-
-    $assignmentState = [string](Get-Dpi4DProperty $assignmentNode "value")
-    if (-not (Test-Dpi4DProvenance $assignmentNode $true) -or -not (($assignmentState -ceq "ASSIGNED") -or ($assignmentState -ceq "NOT_ASSIGNED"))) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "ASSIGNMENT_NOT_PROVEN" "Assegnazione non provata; UNKNOWN non diventa GAP." @("assigned_ppe") "PARTIAL"
-    }
-    if (-not (Test-Dpi4DRelation (Get-Dpi4DProperty $relations "worker_ppe_assignment") $worker $ppeType $assignmentState $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "ASSIGNMENT_NOT_PROVEN" "Relazione worker-ppe assignment non provata esattamente." @("worker_ppe_assignment") "PARTIAL"
-    }
-
-    if ($assignmentState -ceq "NOT_ASSIGNED") {
-        return New-Dpi4DDecision $InputObject "GAP" "REQUIRED_PPE_NOT_ASSIGNED" "Requirement provato; DPI richiesto esplicitamente non assegnato." @() "PASS"
-    }
-
-    $evidence = [string](Get-Dpi4DProperty $evidenceNode "value")
-    if (-not (Test-Dpi4DText $evidence) -or -not (Test-Dpi4DProvenance $evidenceNode $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "EVIDENCE_NOT_PROVEN" "Assegnazione presente ma evidenza non provata." @("evidence_ref") "PARTIAL"
-    }
-    if (-not (Test-Dpi4DRelation (Get-Dpi4DProperty $relations "assignment_evidence") $ppeType $evidence "PRESENT" $true)) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "EVIDENCE_NOT_PROVEN" "Relazione assignment-evidence non provata esattamente." @("assignment_evidence") "PARTIAL"
-    }
-
-    $validityState = [string](Get-Dpi4DProperty $validityNode "value")
-    if (-not (Test-Dpi4DProvenance $validityNode $true) -or -not (($validityState -ceq "VALID") -or ($validityState -ceq "INVALID") -or ($validityState -ceq "EXPIRED"))) {
-        return New-Dpi4DDecision $InputObject "NON_VERIFICATO" "VALIDITY_NOT_PROVEN" "Validita non provata; nessuna inferenza temporale." @("validity") "PARTIAL"
-    }
-
-    if (($validityState -ceq "INVALID") -or ($validityState -ceq "EXPIRED")) {
-        return New-Dpi4DDecision $InputObject "GAP" "ASSIGNED_PPE_INVALID_OR_EXPIRED" "Requirement e assegnazione provati; copertura esplicitamente invalida o scaduta." @() "PASS"
-    }
-
-    return New-Dpi4DDecision $InputObject "COVERED" "COVERED_COMPLETE_CHAIN" "Catena completa, coerente, valida e tracciabile." @() "PASS"
-}
+# 4D R2 has exactly one semantic validator/decision engine.
+. (Join-Path $PSScriptRoot "DPI_4D_CONTRACT.ps1")
 
 # Root demo = cartella "demo" (portabile su qualunque PC)
 $root = Split-Path -Parent $PSScriptRoot
@@ -247,27 +22,28 @@ if (Test-Path -LiteralPath $positiveChainPath -PathType Leaf) {
     if ($positiveFiles.Count -ne 1 -or -not ($positiveFiles[0].FullName -ceq $positiveChainPath)) {
         [pscustomobject]@{
             ENGINE = "DPI_4D_POSITIVE_CHAIN_MINIMUM"
+            CONTRACT_VERSION = "DPI_4D_R2"
             DECISION = "NON_VERIFICATO"
-            REASON_CODE = "UNEXPECTED_INPUT_FILES"
-            REASON_TEXT_MINIMAL = "4D accetta un solo DPI_4D_CHAIN.json; nessun input viene ignorato."
+            REASON_CODE = "CARDINALITY_UNSUPPORTED"
+            REASON_TEXT_MINIMAL = "4D Minimum accetta un solo DPI_4D_CHAIN.json; nessun input viene ignorato."
             MISSING_LINKS = @("input_inventory")
             SOURCE_REFS = @()
             PROVENANCE = "FAIL"
             DOMAIN_INFERENCE = "ZERO"
             PROVENANCE_TRACE = @()
         } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $decisionPath -Encoding UTF8
-        Write-Error "DPI_4D_UNEXPECTED_INPUT_FILES" -ErrorAction Continue
+        Write-Error "DPI_4D_CARDINALITY_UNSUPPORTED" -ErrorAction Continue
         exit 4
     }
 
     try {
         $inputObject = Get-Content -LiteralPath $positiveChainPath -Raw -Encoding UTF8 | ConvertFrom-Json
         $decision = Invoke-Dpi4DDecision $inputObject
-        $decision | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $decisionPath -Encoding UTF8
+        $decision | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $decisionPath -Encoding UTF8
 
         @"
-DPI GUARDIAN 4D POSITIVE CHAIN REPORT
-DATA: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+DPI GUARDIAN 4D R2 POSITIVE CHAIN REPORT
+AS_OF_DATE: $($inputObject.as_of_date)
 
 INPUT: $positiveChainPath
 OUTPUT: $decisionPath
@@ -278,7 +54,10 @@ PROVENANCE: $($decision.PROVENANCE)
 DOMAIN_INFERENCE: $($decision.DOMAIN_INFERENCE)
 
 ==========================================
-4D POSITIVE PATH: ACTIVE
+4D R2 POSITIVE PATH: ACTIVE
+STRICT_SCHEMA: ACTIVE
+SOURCE_BINDING: ACTIVE
+TEMPORAL_COHERENCE: ACTIVE
 FAIL-CLOSED: PRESERVED
 ==========================================
 "@ | Set-Content -LiteralPath $reportFile -Encoding UTF8
@@ -294,6 +73,7 @@ FAIL-CLOSED: PRESERVED
     catch {
         [pscustomobject]@{
             ENGINE = "DPI_4D_POSITIVE_CHAIN_MINIMUM"
+            CONTRACT_VERSION = "DPI_4D_R2"
             DECISION = "NON_VERIFICATO"
             REASON_CODE = "STRUCTURED_INPUT_INVALID"
             REASON_TEXT_MINIMAL = $_.Exception.Message
