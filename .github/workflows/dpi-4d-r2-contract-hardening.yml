@@ -8,6 +8,7 @@ on:
       - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
       - demo/04_SCRIPT/DPI_4D_CONTRACT.ps1
       - tests/dpi-4d-r2-contract-hardening.ps1
+      - tests/dpi-4d-r2-smoke-diagnostic.ps1
       - tests/dpi-4d-positive-chain.ps1
       - tests/dpi-4c-realinput-failclosed.ps1
       - tests/DPI_4D_R2_CONTRACT_ATTACK_MATRIX.md
@@ -17,6 +18,7 @@ on:
       - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
       - demo/04_SCRIPT/DPI_4D_CONTRACT.ps1
       - tests/dpi-4d-r2-contract-hardening.ps1
+      - tests/dpi-4d-r2-smoke-diagnostic.ps1
       - tests/dpi-4d-positive-chain.ps1
       - tests/dpi-4c-realinput-failclosed.ps1
       - tests/DPI_4D_R2_CONTRACT_ATTACK_MATRIX.md
@@ -34,8 +36,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Diagnostic valid-case runtime
+        shell: pwsh
+        run: ./tests/dpi-4d-r2-smoke-diagnostic.ps1
       - name: Run R2 strict contract, predefined attacks, blind attacks, and regressions
         shell: pwsh
         run: ./tests/dpi-4d-r2-contract-hardening.ps1 -Mode Full
-
-# R2 gate rerun marker after fixing only fixture-mutation mechanics; assertions unchanged.
