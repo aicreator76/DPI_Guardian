@@ -15,7 +15,15 @@ function Get-P {
     if ($null -eq $Object) { return $null }
     $p = $Object.PSObject.Properties[$Name]
     if ($null -eq $p) { return $null }
-    Write-Output -NoEnumerate $p.Value
+    return $p.Value
+}
+
+function Get-RawP {
+    param($Object,[string]$Name)
+    if ($null -eq $Object) { return [pscustomobject]@{Exists=$false;Value=$null} }
+    $p = $Object.PSObject.Properties[$Name]
+    if ($null -eq $p) { return [pscustomobject]@{Exists=$false;Value=$null} }
+    return [pscustomobject]@{Exists=$true;Value=$p.Value}
 }
 
 function Test-Object {
@@ -56,8 +64,10 @@ function Parse-Date {
 
 function Test-Interval {
     param($Object)
-    $from = Parse-Date (Get-P $Object 'valid_from')
-    $to = Parse-Date (Get-P $Object 'valid_to') $true
+    $rawFrom = (Get-RawP $Object 'valid_from').Value
+    $rawTo = (Get-RawP $Object 'valid_to').Value
+    $from = Parse-Date $rawFrom
+    $to = Parse-Date $rawTo $true
     if ($null -eq $from -or $null -eq $to) { return $false }
     if ($to -ne [datetime]::MinValue -and $from -gt $to) { return $false }
     return $true
@@ -66,8 +76,8 @@ function Test-Interval {
 function Test-ActiveAt {
     param($Object,[datetime]$AsOf)
     if (-not (Test-Interval $Object)) { return $false }
-    $from = Parse-Date (Get-P $Object 'valid_from')
-    $to = Parse-Date (Get-P $Object 'valid_to') $true
+    $from = Parse-Date ((Get-RawP $Object 'valid_from').Value)
+    $to = Parse-Date ((Get-RawP $Object 'valid_to').Value) $true
     if ($from -gt $AsOf) { return $false }
     if ($to -ne [datetime]::MinValue -and $to -lt $AsOf) { return $false }
     return $true
@@ -101,14 +111,14 @@ function Fail-Decision {
 function Build-Registry {
     param($InputObject,[datetime]$AsOf)
 
-    $prop = $InputObject.PSObject.Properties['source_registry']
-    if ($null -eq $prop -or $null -eq $prop.Value) {
+    $rawRegistry = Get-RawP $InputObject 'source_registry'
+    if (-not $rawRegistry.Exists -or $null -eq $rawRegistry.Value) {
         return [pscustomobject]@{Ok=$false;Reason='SOURCE_NOT_BOUND';Text='source_registry mancante.';Map=$null}
     }
-    if (-not ($prop.Value -is [System.Array])) {
+    if (-not ($rawRegistry.Value -is [System.Array])) {
         return [pscustomobject]@{Ok=$false;Reason='SCHEMA_TYPE_INVALID';Text='source_registry deve essere JSON array.';Map=$null}
     }
-    $items = @($prop.Value)
+    $items = @($rawRegistry.Value)
     if ($items.Count -eq 0) {
         return [pscustomobject]@{Ok=$false;Reason='SOURCE_NOT_BOUND';Text='source_registry vuoto.';Map=$null}
     }
@@ -123,7 +133,7 @@ function Build-Registry {
             return [pscustomobject]@{Ok=$false;Reason='SCHEMA_UNKNOWN_FIELD';Text=('Campo source_registry ignoto: '+($unknown -join ','));Map=$null}
         }
         foreach ($field in @('source_id','source_version','authority_ref')) {
-            if (-not (Test-StrictString (Get-P $source $field))) {
+            if (-not (Test-StrictString ((Get-RawP $source $field).Value))) {
                 return [pscustomobject]@{Ok=$false;Reason='SCHEMA_TYPE_INVALID';Text=('Campo source_registry non strict: '+$field);Map=$null}
             }
         }
@@ -146,11 +156,11 @@ function Check-Binding {
     param($Object,$Registry,[bool]$AuthorityRequired=$true)
 
     foreach ($field in @('source_ref','source_version')) {
-        if (-not (Test-StrictString (Get-P $Object $field))) {
+        if (-not (Test-StrictString ((Get-RawP $Object $field).Value))) {
             return [pscustomobject]@{Ok=$false;Reason='SCHEMA_TYPE_INVALID';Text=('Provenance non strict: '+$field)}
         }
     }
-    $authority = Get-P $Object 'authority_ref'
+    $authority = (Get-RawP $Object 'authority_ref').Value
     if ($AuthorityRequired -and -not (Test-StrictString $authority)) {
         return [pscustomobject]@{Ok=$false;Reason='SCHEMA_TYPE_INVALID';Text='authority_ref non strict.'}
     }
@@ -200,15 +210,15 @@ function Invoke-Dpi4DDecision {
     }
 
     foreach ($field in @('case_id','as_of_date','source_ref','source_version','authority_ref')) {
-        if (-not (Test-StrictString (Get-P $InputObject $field))) {
+        if (-not (Test-StrictString ((Get-RawP $InputObject $field).Value))) {
             return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' ('Campo top-level non strict: '+$field) @($field)
         }
     }
-    $synthetic = Get-P $InputObject 'synthetic_fixture'
+    $synthetic = (Get-RawP $InputObject 'synthetic_fixture').Value
     if (-not ($synthetic -is [bool]) -or -not $synthetic) {
         return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' 'synthetic_fixture deve essere boolean true.' @('synthetic_fixture')
     }
-    $asOf = Parse-Date (Get-P $InputObject 'as_of_date')
+    $asOf = Parse-Date ((Get-RawP $InputObject 'as_of_date').Value)
     if ($null -eq $asOf) {
         return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' 'AS_OF_DATE deve essere yyyy-MM-dd.' @('as_of_date')
     }
@@ -249,7 +259,7 @@ function Invoke-Dpi4DDecision {
             return Fail-Decision $InputObject 'SCHEMA_UNKNOWN_FIELD' ('Campo nodo ignoto in '+$name+': '+($unknown -join ',')) @($name)
         }
         foreach ($field in @('value','source_ref','source_version','authority_ref')) {
-            if (-not (Test-StrictString (Get-P $node $field))) {
+            if (-not (Test-StrictString ((Get-RawP $node $field).Value))) {
                 return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' ('Campo nodo non strict: '+$name+'.'+$field) @($name)
             }
         }
@@ -289,12 +299,12 @@ function Invoke-Dpi4DDecision {
             return Fail-Decision $InputObject 'SCHEMA_UNKNOWN_FIELD' ('Campo relazione ignoto in '+$name+': '+($unknown -join ',')) @($name)
         }
         foreach ($field in @('from','to','source_ref','source_version','authority_ref')) {
-            if (-not (Test-StrictString (Get-P $rel $field))) {
+            if (-not (Test-StrictString ((Get-RawP $rel $field).Value))) {
                 return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' ('Campo relazione non strict: '+$name+'.'+$field) @($name)
             }
         }
-        $status = Get-P $rel 'status'
-        if ($null -ne $status -and -not (Test-StrictString $status $true)) {
+        $rawStatus = Get-RawP $rel 'status'
+        if ($rawStatus.Exists -and -not (Test-StrictString $rawStatus.Value $true)) {
             return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' ('Status relazione non strict: '+$name) @($name)
         }
         if (-not (Test-Interval $rel)) {
@@ -353,8 +363,8 @@ function Invoke-Dpi4DDecision {
     if (-not ($validity -ceq 'VALID' -or $validity -ceq 'INVALID' -or $validity -ceq 'EXPIRED')) {
         return Fail-Decision $InputObject 'VALIDITY_NOT_PROVEN' 'validity.value non ammesso.' @('validity')
     }
-    $validFrom = Parse-Date (Get-P $nodes['validity'] 'valid_from')
-    $validTo = Parse-Date (Get-P $nodes['validity'] 'valid_to') $true
+    $validFrom = Parse-Date ((Get-RawP $nodes['validity'] 'valid_from').Value)
+    $validTo = Parse-Date ((Get-RawP $nodes['validity'] 'valid_to').Value) $true
     if ($validity -ceq 'VALID') {
         if ($validFrom -gt $asOf -or ($validTo -ne [datetime]::MinValue -and $validTo -lt $asOf)) {
             return Fail-Decision $InputObject 'VALIDITY_CONTRADICTION' 'VALID contraddice AS_OF_DATE e intervallo.' @('validity')
