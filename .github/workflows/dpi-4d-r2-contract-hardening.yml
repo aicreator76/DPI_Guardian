@@ -1,0 +1,39 @@
+name: DPI Guardian 4D R2 contract hardening
+
+on:
+  push:
+    branches:
+      - fix/dpi-4d-contract-hardening-r2
+    paths:
+      - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
+      - demo/04_SCRIPT/DPI_4D_CONTRACT.ps1
+      - tests/dpi-4d-r2-contract-hardening.ps1
+      - tests/dpi-4d-positive-chain.ps1
+      - tests/dpi-4c-realinput-failclosed.ps1
+      - tests/DPI_4D_R2_CONTRACT_ATTACK_MATRIX.md
+      - .github/workflows/dpi-4d-r2-contract-hardening.yml
+  pull_request:
+    paths:
+      - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
+      - demo/04_SCRIPT/DPI_4D_CONTRACT.ps1
+      - tests/dpi-4d-r2-contract-hardening.ps1
+      - tests/dpi-4d-positive-chain.ps1
+      - tests/dpi-4c-realinput-failclosed.ps1
+      - tests/DPI_4D_R2_CONTRACT_ATTACK_MATRIX.md
+      - .github/workflows/dpi-4d-r2-contract-hardening.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-hardening-and-regression:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run R2 strict contract, predefined attacks, blind attacks, and regressions
+        shell: pwsh
+        run: ./tests/dpi-4d-r2-contract-hardening.ps1 -Mode Full
