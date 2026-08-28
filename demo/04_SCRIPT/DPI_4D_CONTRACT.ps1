@@ -333,6 +333,9 @@ function Invoke-Dpi4DDecision {
         if ($rawStatus.Exists -and -not (Test-StrictString $rawStatus.Value $true)) {
             return Fail-Decision $InputObject 'SCHEMA_TYPE_INVALID' ('Status relazione non strict: '+$name) @($name)
         }
+        if ($rawStatus.Exists -and $rawStatus.Value.Length -gt 0 -and -not ($name -ceq 'worker_ppe_assignment' -or $name -ceq 'assignment_evidence')) {
+            return Fail-Decision $InputObject 'RELATION_STATUS_UNSUPPORTED' ('Status non supportato sulla relazione: '+$name) @($name)
+        }
         if (-not (Test-Interval $rel)) {
             return Fail-Decision $InputObject 'VALIDITY_CONTRADICTION' ('Intervallo relazione invalido: '+$name) @($name)
         }
@@ -385,7 +388,7 @@ function Invoke-Dpi4DDecision {
         return Fail-Decision $InputObject 'EVIDENCE_NOT_PROVEN' 'assignment_evidence.status deve essere PRESENT.' @('assignment_evidence')
     }
 
-    foreach ($name in @('worker_ref','job_role_id','risk_id','requirement_id','ppe_type_id','assigned_ppe','evidence_ref')) {
+    foreach ($name in @('worker_ref','job_role_id','risk_id','requirement_id','ppe_type_id','assigned_ppe','evidence_ref','validity')) {
         if (-not (Test-ActiveAt $nodes[$name] $asOf)) {
             return Fail-Decision $InputObject 'VALIDITY_CONTRADICTION' ('Nodo non coerente ad AS_OF_DATE: '+$name) @($name)
         }
