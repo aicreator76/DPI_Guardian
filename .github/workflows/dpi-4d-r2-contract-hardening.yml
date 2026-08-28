@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - fix/dpi-4d-contract-hardening-r2
+      - fix/dpi-4d-r2-veritas-minfix
     paths:
       - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
       - demo/04_SCRIPT/DPI_4D_CONTRACT.ps1
       - tests/dpi-4d-r2-contract-hardening.ps1
+      - tests/dpi-4d-r2-veritas-regressions.ps1
       - tests/dpi-4d-positive-chain.ps1
       - tests/dpi-4c-realinput-failclosed.ps1
       - tests/DPI_4D_R2_CONTRACT_ATTACK_MATRIX.md
@@ -17,6 +19,7 @@ on:
       - demo/04_SCRIPT/DPI_GUARDIAN_RUN.ps1
       - demo/04_SCRIPT/DPI_4D_CONTRACT.ps1
       - tests/dpi-4d-r2-contract-hardening.ps1
+      - tests/dpi-4d-r2-veritas-regressions.ps1
       - tests/dpi-4d-positive-chain.ps1
       - tests/dpi-4c-realinput-failclosed.ps1
       - tests/DPI_4D_R2_CONTRACT_ATTACK_MATRIX.md
@@ -37,3 +40,6 @@ jobs:
       - name: Run R2 strict contract, predefined attacks, blind attacks, and regressions
         shell: pwsh
         run: ./tests/dpi-4d-r2-contract-hardening.ps1 -Mode Full
+      - name: Run NEW VERITAS R2 regressions
+        shell: pwsh
+        run: ./tests/dpi-4d-r2-veritas-regressions.ps1
