@@ -1,0 +1,48 @@
+{
+  "name": "DPI_GUARDIAN_EVENT_RECONSTRUCTION_R1",
+  "authority": "Cristian Micheli",
+  "branch": "operator005/event-reconstruction-r1",
+  "derived_from_sealed_wow_commit": "ea2a70e5aeda02d49672f5f1f468acce0c2f5cb7",
+  "wow_freeze_changed": false,
+  "baseline_changed": false,
+  "core_4d_changed": false,
+  "scale50_changed": false,
+  "cesare_changed": false,
+  "event": {
+    "event_id": "EVT-005-001",
+    "worker": "005",
+    "event_at": "2026-09-05T10:30:00+02:00",
+    "data_class": "CONTROLLED_SYNTHETIC_EVENT"
+  },
+  "test_summary": {
+    "functional": "8/8 PASS",
+    "red_team": "13/13 PASS",
+    "post_event_leakage": 0,
+    "false_green": 0,
+    "visual_render": "PASS_VIA_CHROMIUM_SET_CONTENT",
+    "localhost_navigation": "NOT_VERIFIED_BLOCKED_BY_ADMINISTRATOR",
+    "pdf_pages": 6
+  },
+  "success_gate": {
+    "EVENT_RECONSTRUCTION_MATERIALIZED": "YES",
+    "WORKER_AT_EVENT": "PASS",
+    "ASSIGNMENTS_AT_EVENT": "PASS",
+    "UNITS_AT_EVENT": "PASS",
+    "DOCUMENT_VERSION_AT_EVENT": "PASS",
+    "INSPECTION_STATE_AT_EVENT": "PASS",
+    "FORMATION_AT_EVENT": "PASS",
+    "ADDESTRAMENTO_AT_EVENT": "NON_VERIFICATO_CORRECT",
+    "POST_EVENT_LEAKAGE": 0,
+    "FALSE_GREEN": 0,
+    "EVENT_DOSSIER": "PASS"
+  },
+  "artifacts": {
+    "package_name": "DPI_GUARDIAN_EVENT_RECONSTRUCTION_R1.zip",
+    "package_size": 797499,
+    "package_sha256": "10d47a4f3b2e23bc80ee3b149ebeb985e52edf135d9b357c0f73029e995c4c4f",
+    "dossier_pdf_sha256": "51ea5872ffc3a13993613076a068ea816d3223adad4ceae5ef8edd47e642969c",
+    "visual_screenshot_sha256": "795a07d89af6de9a9face2fee7bd5030706109e4786ebfd2c4fb18ba85924fe8"
+  },
+  "git_runtime_bytes_materialized": false,
+  "git_runtime_bytes_note": "The executable runtime package is preserved as a local conversation artifact with SHA256. This Git commit records evidence/provenance only and does not claim byte-for-byte runtime materialization in Git."
+}
