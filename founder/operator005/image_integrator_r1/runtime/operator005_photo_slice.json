@@ -1,0 +1,142 @@
+{
+  "name": "DPI_GUARDIAN_IMAGE_INTEGRATOR_R1",
+  "derivation_only": true,
+  "consumer_of_evidence_only": true,
+  "base": {
+    "name": "DPI_GUARDIAN_FOUNDER_EVENT_MOBILE_WOW_01",
+    "branch": "operator005/event-mobile-wow-freeze-r1",
+    "base_head": "4d21fd0bcd935e443698dd2aa289538fd650ac67",
+    "founder_index_sha256": "9fcf09e443438289b7bf6bf8c07c235008149a84445916187b9a88054ea550e8",
+    "event_mobile_sha256": "033ec9aa36ed70d53c48ae8dfd24c3400dd50e2430b88293003ffa3bf982c919",
+    "baseline_mutated": false
+  },
+  "image_input": {
+    "source": "TEUFELBERGER_SOURCE_CURATOR_R2_REPORT",
+    "classified_bindings_received": 508,
+    "IMAGE_PROVEN": 0,
+    "IMAGE_PARTIAL": 6,
+    "IMAGE_AMBIGUOUS": 502,
+    "IMAGE_NOT_FOUND": 0,
+    "promotion_performed": false
+  },
+  "reference_date": "2026-08-30",
+  "worker": {
+    "worker_id": "005",
+    "name": "Operatore 005",
+    "company": "CAMELOT DEMO SRL",
+    "department": "Manutenzione in quota",
+    "role": "Tecnico manutentore",
+    "data_class": "CONTROLLED_SYNTHETIC"
+  },
+  "units": [
+    {
+      "unit_id": "U005-01",
+      "type": "DPI ANTICADUTA",
+      "manufacturer": "TEUFELBERGER",
+      "model": "Energy Pro Evo+",
+      "article_id": "7330397",
+      "serial": "SYN-EPE-005-0001",
+      "lot": "SYN-LOT-2026-005",
+      "data_class": "PHYSICAL_UNIT_CONTROLLED_SYNTHETIC",
+      "dpi_status": "GRIGIO",
+      "dpi_status_reason": "STATO NON DETERMINABILE",
+      "last_inspection": "NON_VERIFICATO",
+      "next_inspection": "NON_VERIFICATO",
+      "next_action": "ACQUISIRE PROVA DI VERIFICA UNITÀ",
+      "documents_count": 2,
+      "image": {
+        "status": "IMAGE_PARTIAL",
+        "display": "BLOCKED",
+        "used": false,
+        "manufacturer": "TEUFELBERGER",
+        "article_id": "7330397",
+        "source": "https://a.storyblok.com/f/312698/x/7c400c8129/instruction-manual_energy-pro-evo.pdf",
+        "source_page": "PDF page 1 / cover",
+        "reason": "Official model image proven; exact catalog article variant is not visually distinguishable, therefore not PROVEN at exact-variant level. Mandate requires IMAGE_PROVEN for Energy Pro Evo+."
+      }
+    },
+    {
+      "unit_id": "U005-02",
+      "type": "IMBRACATURA ANTICADUTA",
+      "manufacturer": "DEMO SAFETY",
+      "model": "HARNESS PRO S2",
+      "article_id": null,
+      "serial": "SYN-HAR-005-0002",
+      "lot": "SYN-LOT-2026-102",
+      "data_class": "CONTROLLED_SYNTHETIC_UI_FIXTURE",
+      "dpi_status": "VERDE",
+      "dpi_status_reason": "OK NEL PERIMETRO DELLE EVIDENZE DELLA FIXTURE",
+      "last_inspection": "2026-07-15",
+      "next_inspection": "2027-01-15",
+      "next_action": "PROSSIMA VERIFICA 15/01/2027",
+      "documents_count": 3,
+      "image": {
+        "status": "SYNTHETIC_NO_REAL_IMAGE",
+        "display": "SYNTHETIC_PLACEHOLDER",
+        "used": false,
+        "manufacturer": "DEMO SAFETY",
+        "article_id": null,
+        "source": "synthetic://operator005/image-integrator/no-real-image",
+        "reason": "Synthetic product: real photography is forbidden by mandate."
+      }
+    },
+    {
+      "unit_id": "U005-03",
+      "type": "CORDINO DOPPIO CON ASSORBITORE",
+      "manufacturer": "DEMO HEIGHT",
+      "model": "TWIN ABSORB X",
+      "article_id": null,
+      "serial": "SYN-LAN-005-0003",
+      "lot": "SYN-LOT-2026-203",
+      "data_class": "CONTROLLED_SYNTHETIC_UI_FIXTURE",
+      "dpi_status": "GIALLO",
+      "dpi_status_reason": "PROSSIMA VERIFICA ENTRO 30 GIORNI",
+      "last_inspection": "2026-03-10",
+      "next_inspection": "2026-09-10",
+      "next_action": "VERIFICA ENTRO 10/09/2026",
+      "documents_count": 2,
+      "image": {
+        "status": "SYNTHETIC_NO_REAL_IMAGE",
+        "display": "SYNTHETIC_PLACEHOLDER",
+        "used": false,
+        "manufacturer": "DEMO HEIGHT",
+        "article_id": null,
+        "source": "synthetic://operator005/image-integrator/no-real-image",
+        "reason": "Synthetic product: real photography is forbidden by mandate."
+      }
+    },
+    {
+      "unit_id": "U005-04",
+      "type": "DISPOSITIVO RETRATTILE",
+      "manufacturer": "DEMO FALL",
+      "model": "RETRACT 12",
+      "article_id": null,
+      "serial": "SYN-RET-005-0004",
+      "lot": "SYN-LOT-2025-304",
+      "data_class": "CONTROLLED_SYNTHETIC_UI_FIXTURE",
+      "dpi_status": "ROSSO",
+      "dpi_status_reason": "VERIFICA SCADUTA PROVATA NELLA FIXTURE",
+      "last_inspection": "2026-02-15",
+      "next_inspection": "2026-08-15",
+      "next_action": "VERIFICA SCADUTA 15/08/2026",
+      "documents_count": 2,
+      "image": {
+        "status": "SYNTHETIC_NO_REAL_IMAGE",
+        "display": "SYNTHETIC_PLACEHOLDER",
+        "used": false,
+        "manufacturer": "DEMO FALL",
+        "article_id": null,
+        "source": "synthetic://operator005/image-integrator/no-real-image",
+        "reason": "Synthetic product: real photography is forbidden by mandate."
+      }
+    }
+  ],
+  "expected": {
+    "IMAGES_PROVEN_USED": 0,
+    "IMAGES_PARTIAL_USED": 0,
+    "AMBIGUOUS_REJECTED_GLOBAL": 502,
+    "OP005_REAL_PHOTOS_SHOWN": 0,
+    "FOUNDER_TEST": "READY",
+    "MERGE": "NO"
+  }
+}
