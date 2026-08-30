@@ -1,0 +1,111 @@
+{
+  "NAME": "DPI_GUARDIAN_FOUNDER_OPERATOR_MULTI_DPI_WOW_01",
+  "FREEZE_CLASS": "FOUNDER_WOW_VISUAL_RUNTIME_EVIDENCE",
+  "FOUNDER": "CRISTIAN",
+  "FOUNDER_VERDICT": "WOW_REALMENTE_ESPRESSO_DAL_FONDATORE",
+  "SOURCE_RUNTIME": "OP005_FOUNDER_MULTIDPI_REPORT_RUNTIME_20260830_0817",
+  "TARGET_BRANCH": "operator005/founder-multidpi-report-r1",
+  "BASELINE_HEAD": "416028dbe18943a2df148b8ed7917678f5bb4558",
+  "BASELINE_FREEZE_SHA256": "6eb71344c7c703484b6f455f005f095d2c0076cd6a040a19cce9ce11342a7124",
+  "COMMIT_BINDING": "RESOLVED_BY_GIT_SEAL_COMMIT",
+  "PRESERVED_ROLES": {
+    "runtime_visual": "runtime/index.html",
+    "runtime_fixture": "runtime/founder_multidpi_fixture.js",
+    "operator_report_pdf": "evidence/relazione_operatore_005_preview.pdf",
+    "founder_wow_screenshot": "evidence/founder_multidpi_verified.png",
+    "test_script": "tests/founder_wow_freeze_test.py",
+    "test_report": "tests/TEST_REPORT.json"
+  },
+  "CONSTRAINTS": {
+    "NO_MERGE": true,
+    "NO_FEATURE_EXPANSION": true,
+    "NO_UI_POLISH": true,
+    "BASELINE_MUTATED": false
+  },
+  "TEST_SUMMARY": {
+    "FREEZE_TESTS": "14/14 PASS",
+    "BASELINE_TESTS": "17/17 PASS",
+    "FALSE_GREEN": 0,
+    "REPORT_PAGES": 5,
+    "DPI_VISIBLE": 4,
+    "DOCUMENTS_VISIBLE": 9,
+    "SCREENSHOT_DIMENSIONS": "1440x2474"
+  },
+  "FILES": [
+    {
+      "path": "FOUNDER_VERDICT.txt",
+      "size": 440,
+      "sha256": "bda1047b37db7270de8737485a05b5c34b01b168c1747c2448fcd75449926b80"
+    },
+    {
+      "path": "evidence/founder_multidpi_verified.png",
+      "size": 446249,
+      "sha256": "4bd963454e38c8f4e8fd4d130231a2f6078adf6d51322b4a49386e7bceabbe7f"
+    },
+    {
+      "path": "evidence/relazione_operatore_005_preview.pdf",
+      "size": 34981,
+      "sha256": "a51b843ab6957f668c00a1d15367b2c2caf8074b5e6094a52973ae934a583ce9"
+    },
+    {
+      "path": "runtime/RUNTIME_PROVENANCE.txt",
+      "size": 391,
+      "sha256": "d1216c0be58ce4a2c41944e7853ee1aaea111724b10c5df519a43a20fced12cc"
+    },
+    {
+      "path": "runtime/baseline/DPI_GUARDIAN_OPERATOR005_EVIDENCE_SLICE_01.zip",
+      "size": 12691,
+      "sha256": "6eb71344c7c703484b6f455f005f095d2c0076cd6a040a19cce9ce11342a7124"
+    },
+    {
+      "path": "runtime/baseline/FREEZE_MANIFEST.json",
+      "size": 1843,
+      "sha256": "2b22a443c8a192f7be5bd475573a7709c20df33b78e46c8e17c877d845adaac4"
+    },
+    {
+      "path": "runtime/baseline/document_resolver.js",
+      "size": 9843,
+      "sha256": "11e588eeed0cdcf507e10e2e381abd3986c19eadc05e5d389a2a410f6db174ba"
+    },
+    {
+      "path": "runtime/baseline/index.html",
+      "size": 11233,
+      "sha256": "dadad764836aca3cfc4f45a07d6317fe1691cf8029be3e1a50a116440b840e6f"
+    },
+    {
+      "path": "runtime/baseline/operator005_contract.js",
+      "size": 6204,
+      "sha256": "a63b3d3d987a950bbe5efb26dcd6170fa81633cdc2cbf74250f674538d4e2120"
+    },
+    {
+      "path": "runtime/baseline/operator005_tests.js",
+      "size": 4768,
+      "sha256": "3a3402693a51111dd035ba498bc24a7bbd77c21e778f7c8c3792f5ca1bcde356"
+    },
+    {
+      "path": "runtime/baseline/test_report.json",
+      "size": 1895,
+      "sha256": "fabf5b5635d76cd906e70d00a2cf1e219eec32de4a900d3f9236578c3bb3bb35"
+    },
+    {
+      "path": "runtime/founder_multidpi_fixture.js",
+      "size": 5176,
+      "sha256": "8e8a7c88758a5b1c1b053e21adb72aa28cf966bf26aab2b0cc7ab3ab8339146a"
+    },
+    {
+      "path": "runtime/index.html",
+      "size": 17144,
+      "sha256": "6eaf94063b34bf8e63158c92add46cc0a42da82601a08ef226de0eb0309a67a1"
+    },
+    {
+      "path": "tests/TEST_REPORT.json",
+      "size": 5230,
+      "sha256": "aa5e95da3a1e49391e3afd621d355715adfe7983f8c3b9ae6a5da4d27d4969da"
+    },
+    {
+      "path": "tests/founder_wow_freeze_test.py",
+      "size": 4057,
+      "sha256": "97e930bebf6eaa0736518a7f5d7b8fb8fe519946083e388730302d62748cdb45"
+    }
+  ]
+}
