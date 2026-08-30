@@ -15,7 +15,9 @@
   }
 
   function getWorker(contract, workerId) {
-    if (String(contract.worker.worker_id) !== String(workerId)) return result('NON_VERIFICATO', null, 'WORKER_NOT_FOUND');
+    if (String(contract.worker.worker_id) !== String(workerId)) {
+      return result('NON_VERIFICATO', null, 'WORKER_NOT_FOUND');
+    }
     return result('PASS', contract.worker, null);
   }
 
@@ -97,19 +99,25 @@
   function answerFounderQuery(contract, workerId) {
     const worker = getWorker(contract, workerId);
     if (worker.status !== 'PASS') return result('NON_VERIFICATO', null, worker.reason);
+
     const assignment = getAssignmentForWorker(contract, workerId);
     if (assignment.status !== 'PASS') return result('NON_VERIFICATO', null, assignment.reason);
+
     const unit = getUnit(contract, assignment.value.unit_id);
     if (unit.status !== 'PASS') return result('NON_VERIFICATO', null, unit.reason);
+
     const product = getProduct(contract, unit.value.product_id);
     if (product.status !== 'PASS') return result('NON_VERIFICATO', null, product.reason);
+
     const manual = getCurrentManual(contract, product.value.product_id, contract.generated_at);
     if (manual.status !== 'PASS') return result('NON_VERIFICATO', null, manual.reason);
+
     const coverage = getSourceForField(contract, manual.value.document_id, 'PRODUCT_COVERAGE');
     if (coverage.status !== 'PASS') return result('NON_VERIFICATO', null, coverage.reason);
 
     const materialized = manual.value.source.evidence_materialized === 'YES';
     const answerStatus = materialized ? 'PROVEN' : 'PARTIAL_SOURCE_BYTES_NOT_MATERIALIZED';
+
     const whyHuman = `Questo è il manuale ufficiale che copre ${product.value.name}, il modello collegato all'unità ${unit.value.unit_id} assegnata all'Operatore ${worker.value.worker_id}. La fonte è identificata e la pagina di copertura è nota; la copia remota originale non è materializzata localmente.`;
     const whyTechnical = `worker ${worker.value.worker_id} -> assignment ${assignment.value.assignment_id} -> unit ${unit.value.unit_id} -> product ${product.value.product_id}/article ${product.value.article_code} -> document ${manual.value.document_id} -> source ${manual.value.source.source_status} -> page ${coverage.value.pages.join(',')} -> materialization ${manual.value.source.materialization_status}`;
 
@@ -149,7 +157,8 @@
     const manual = product.status === 'PASS' ? getCurrentManual(contract, product.value.product_id, contract.generated_at) : result('NON_VERIFICATO');
     const source = manual.status === 'PASS' ? getSourceForField(contract, manual.value.document_id, 'PRODUCT_COVERAGE') : result('NON_VERIFICATO');
     const event = selectDocumentVersionAtDate(contract.event_time_fixture.versions, contract.event_time_fixture.event_at);
-    return {
+
+    const gate = {
       OPERATOR_005_MATERIALIZED: contract.worker.worker_id === '005' ? 'YES' : 'NO',
       WORKER_TO_UNIT: assignment.status === 'PASS' && unit.status === 'PASS' ? 'PASS' : 'FAIL',
       UNIT_TO_PRODUCT: unit.status === 'PASS' && product.status === 'PASS' && unit.value.product_id === product.value.product_id ? 'PASS' : 'FAIL',
@@ -163,7 +172,21 @@
       EVENT_TIME_CASE: event.status === 'PASS' && event.value.document_id === contract.event_time_fixture.expected_document_id ? 'PASS' : 'FAIL',
       FALSE_GREEN: 0
     };
+    return gate;
   }
 
-  return { getWorker, getAssignmentForWorker, getUnit, getProduct, getDocumentsForProduct, getCurrentManual, getDocumentAtDate, getSourceForField, getDocumentsForWorker, selectDocumentVersionAtDate, answerFounderQuery, evaluateGate };
+  return {
+    getWorker,
+    getAssignmentForWorker,
+    getUnit,
+    getProduct,
+    getDocumentsForProduct,
+    getCurrentManual,
+    getDocumentAtDate,
+    getSourceForField,
+    getDocumentsForWorker,
+    selectDocumentVersionAtDate,
+    answerFounderQuery,
+    evaluateGate
+  };
 });
