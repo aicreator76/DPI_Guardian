@@ -42,25 +42,105 @@
     "LAN_RUNTIME_IS_PRODUCTION": "NO"
   },
   "FILES": [
-    {"path":"FOUNDER_VERDICT.txt","size":494,"sha256":"0dde64264ed2238b66a6d607ad1790d158c82a6c21823a9617a8a3cba94f185c"},
-    {"path":"PROVENANCE.txt","size":1052,"sha256":"59eaa287c52c4a60a3d0700d065557273a241da046dc6de0c6d6a2371ab14f57"},
-    {"path":"delivery/RUN_PHYSICAL_GATE_BUGGY_ORIGINAL.ps1","size":211,"sha256":"25b100863eca6cd208272dba2b83b85b01042559ba7d812cb67c49e876e46fa7"},
-    {"path":"delivery/RUN_PHYSICAL_GATE_FIXED.ps1","size":326,"sha256":"dffbcd50a4cf64926a334a40f596aecde61372293e0bb3b61461bfe889ae5316"},
-    {"path":"delivery/START_OP005_LAN_SERVER.ps1","size":4158,"sha256":"56f0994d9f3407ad67806710b5e24b72d3f93a8288fa6fcf2bfc7182fa13c024"},
-    {"path":"delivery/VERIFY_RUNTIME_IDENTITY.ps1","size":1147,"sha256":"cd83be40b1d2cbf3d67de200138e2fac7b6b51d3944c00e1934a2848531fbca9"},
-    {"path":"evidence/EVT-005-001_DOSSIER_EVENTO.pdf","size":307618,"sha256":"44f5b8585f1df96f437b941d885db3544143bf0e9b5d685504b59c22b34b1756"},
-    {"path":"evidence/mobile_event_390x844.png","size":684910,"sha256":"02a1a04500899ba4863d1e8718502f8e8c97db3572bd9a857d67beee635180e8"},
-    {"path":"runtime/baseline/document_resolver.js","size":9843,"sha256":"11e588eeed0cdcf507e10e2e381abd3986c19eadc05e5d389a2a410f6db174ba"},
-    {"path":"runtime/baseline/operator005_contract.js","size":6204,"sha256":"a63b3d3d987a950bbe5efb26dcd6170fa81633cdc2cbf74250f674538d4e2120"},
-    {"path":"runtime/event_fixture.js","size":8990,"sha256":"8955c424ec1d8bd865492a99d1803b746b6ccd88e63749737dd74326fc2d7a97"},
-    {"path":"runtime/event_mobile.html","size":17987,"sha256":"033ec9aa36ed70d53c48ae8dfd24c3400dd50e2430b88293003ffa3bf982c919"},
-    {"path":"runtime/event_resolver.js","size":5916,"sha256":"03b0010d0871758ce14c0549d2c02d44b3fa9ed597701f7ada6900a1d85c099a"},
-    {"path":"runtime/founder_multidpi_fixture.js","size":5176,"sha256":"8e8a7c88758a5b1c1b053e21adb72aa28cf966bf26aab2b0cc7ab3ab8339146a"},
-    {"path":"runtime/index.html","size":17242,"sha256":"9fcf09e443438289b7bf6bf8c07c235008149a84445916187b9a88054ea550e8"},
-    {"path":"tests/PRIOR_EVENT_LOGIC_TEST_RESULT.json","size":2834,"sha256":"acea4f927cf3e46403cced27fddd39cd2d08e49e484182cac13d399a9602dbe5"},
-    {"path":"tests/TEST_EVENT_LOGIC_RESULT.json","size":2492,"sha256":"e67549ff752fbde0bff85d31303bee03316732a882dd7bd78bb67afeb2fa4e87"},
-    {"path":"tests/TEST_RUNTIME_IDENTITY_RESULT.json","size":995,"sha256":"7ec1a7207a519672577136d8fb37ece0ea3cfd718171d05b31230f9499866ab8"},
-    {"path":"tests/test_event_logic.js","size":5422,"sha256":"17ecad27a26b7fed1f8998de020072a597dfe1e9500000b11b4860d701642cc5"},
-    {"path":"tests/test_runtime_identity.py","size":803,"sha256":"02cc8c3f675617889da4cb56b65943487fdbce1f6ae1355545fb206561b7c551"}
+    {
+      "path": "FOUNDER_VERDICT.txt",
+      "size": 494,
+      "sha256": "0dde64264ed2238b66a6d607ad1790d158c82a6c21823a9617a8a3cba94f185c"
+    },
+    {
+      "path": "PROVENANCE.txt",
+      "size": 1052,
+      "sha256": "59eaa287c52c4a60a3d0700d065557273a241da046dc6de0c6d6a2371ab14f57"
+    },
+    {
+      "path": "delivery/RUN_PHYSICAL_GATE_BUGGY_ORIGINAL.ps1",
+      "size": 211,
+      "sha256": "25b100863eca6cd208272dba2b83b85b01042559ba7d812cb67c49e876e46fa7"
+    },
+    {
+      "path": "delivery/RUN_PHYSICAL_GATE_FIXED.ps1",
+      "size": 326,
+      "sha256": "dffbcd50a4cf64926a334a40f596aecde61372293e0bb3b61461bfe889ae5316"
+    },
+    {
+      "path": "delivery/START_OP005_LAN_SERVER.ps1",
+      "size": 4158,
+      "sha256": "56f0994d9f3407ad67806710b5e24b72d3f93a8288fa6fcf2bfc7182fa13c024"
+    },
+    {
+      "path": "delivery/VERIFY_RUNTIME_IDENTITY.ps1",
+      "size": 1147,
+      "sha256": "cd83be40b1d2cbf3d67de200138e2fac7b6b51d3944c00e1934a2848531fbca9"
+    },
+    {
+      "path": "evidence/EVT-005-001_DOSSIER_EVENTO.pdf",
+      "size": 307618,
+      "sha256": "44f5b8585f1df96f437b941d885db3544143bf0e9b5d685504b59c22b34b1756"
+    },
+    {
+      "path": "evidence/mobile_event_390x844.png",
+      "size": 684910,
+      "sha256": "02a1a04500899ba4863d1e8718502f8e8c97db3572bd9a857d67beee635180e8"
+    },
+    {
+      "path": "runtime/baseline/document_resolver.js",
+      "size": 9843,
+      "sha256": "11e588eeed0cdcf507e10e2e381abd3986c19eadc05e5d389a2a410f6db174ba"
+    },
+    {
+      "path": "runtime/baseline/operator005_contract.js",
+      "size": 6204,
+      "sha256": "a63b3d3d987a950bbe5efb26dcd6170fa81633cdc2cbf74250f674538d4e2120"
+    },
+    {
+      "path": "runtime/event_fixture.js",
+      "size": 8990,
+      "sha256": "8955c424ec1d8bd865492a99d1803b746b6ccd88e63749737dd74326fc2d7a97"
+    },
+    {
+      "path": "runtime/event_mobile.html",
+      "size": 17987,
+      "sha256": "033ec9aa36ed70d53c48ae8dfd24c3400dd50e2430b88293003ffa3bf982c919"
+    },
+    {
+      "path": "runtime/event_resolver.js",
+      "size": 5916,
+      "sha256": "03b0010d0871758ce14c0549d2c02d44b3fa9ed597701f7ada6900a1d85c099a"
+    },
+    {
+      "path": "runtime/founder_multidpi_fixture.js",
+      "size": 5176,
+      "sha256": "8e8a7c88758a5b1c1b053e21adb72aa28cf966bf26aab2b0cc7ab3ab8339146a"
+    },
+    {
+      "path": "runtime/index.html",
+      "size": 17242,
+      "sha256": "9fcf09e443438289b7bf6bf8c07c235008149a84445916187b9a88054ea550e8"
+    },
+    {
+      "path": "tests/PRIOR_EVENT_LOGIC_TEST_RESULT.json",
+      "size": 2834,
+      "sha256": "acea4f927cf3e46403cced27fddd39cd2d08e49e484182cac13d399a9602dbe5"
+    },
+    {
+      "path": "tests/TEST_EVENT_LOGIC_RESULT.json",
+      "size": 2492,
+      "sha256": "e67549ff752fbde0bff85d31303bee03316732a882dd7bd78bb67afeb2fa4e87"
+    },
+    {
+      "path": "tests/TEST_RUNTIME_IDENTITY_RESULT.json",
+      "size": 995,
+      "sha256": "7ec1a7207a519672577136d8fb37ece0ea3cfd718171d05b31230f9499866ab8"
+    },
+    {
+      "path": "tests/test_event_logic.js",
+      "size": 5422,
+      "sha256": "17ecad27a26b7fed1f8998de020072a597dfe1e9500000b11b4860d701642cc5"
+    },
+    {
+      "path": "tests/test_runtime_identity.py",
+      "size": 803,
+      "sha256": "02cc8c3f675617889da4cb56b65943487fdbce1f6ae1355545fb206561b7c551"
+    }
   ]
 }
